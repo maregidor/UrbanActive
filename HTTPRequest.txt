@@ -1,0 +1,24 @@
+1. Coche (driving)
+HTTP
+https://maps.googleapis.com/maps/api/directions/json?
+origin={lat_usuario},{lng_usuario}&
+destination=40.4530,-3.6883&
+mode=driving&
+departure_time=now&
+key=TU_API_KEY
+
+2. Transporte Público (transit)
+HTTP
+https://maps.googleapis.com/maps/api/directions/json?
+origin={lat_usuario},{lng_usuario}&
+destination=40.4530,-3.6883&
+mode=transit&
+key=TU_API_KEY
+
+3. Caminando (walking)
+HTTP
+https://maps.googleapis.com/maps/api/directions/json?
+origin={lat_usuario},{lng_usuario}&
+destination=40.4530,-3.6883&
+mode=walking&
+key=TU_API_KEY

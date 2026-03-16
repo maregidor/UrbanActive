@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Actividades</title>
+</head>
+<body>
+
+<h1>Listado de actividades</h1>
+
+<ul>
+    <li th:each="actividad : ${actividades}">
+        <span th:text="${actividad.tipo}">Tipo</span> -
+        <span th:text="${actividad.descripcion}">Descripción</span>
+        <a th:href="@{/actividades/{id}(id=${actividad.id})}">Seleccionar</a>
+    </li>
+</ul>
+
+</body>
+</html>

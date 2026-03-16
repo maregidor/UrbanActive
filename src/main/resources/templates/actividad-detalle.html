@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle actividad</title>
+</head>
+<body>
+
+<h1>Detalle de la actividad</h1>
+
+<p><strong>Tipo:</strong> <span th:text="${actividad.tipo}"></span></p>
+<p><strong>Descripción:</strong> <span th:text="${actividad.descripcion}"></span></p>
+<p><strong>Nivel:</strong> <span th:text="${actividad.nivel}"></span></p>
+<p><strong>Plazas disponibles:</strong> <span th:text="${actividad.plazasDisponibles}"></span></p>
+
+<form th:action="@{/actividades/{id}/reservar(id=${actividad.id})}" method="post">
+    <button type="submit">Reservar plaza</button>
+</form>
+
+<p th:if="${mensaje}" th:text="${mensaje}"></p>
+
+<a th:href="@{/actividades}">Volver al listado</a>
+
+</body>
+</html>

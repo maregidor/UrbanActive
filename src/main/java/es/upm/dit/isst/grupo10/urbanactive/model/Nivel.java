@@ -1,6 +1,8 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
-Public class Nivel {
+import java.util.Objects;
+
+public class Nivel {
 
     private final double valor; 
 
@@ -19,7 +21,7 @@ Public class Nivel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NivelRequerido that = (NivelRequerido) o;
+        Nivel that = (Nivel) o;
         return Double.compare(that.valor, valor) == 0;
     }
 

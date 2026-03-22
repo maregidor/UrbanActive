@@ -1,6 +1,9 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
-public Class Email {
+import java.util.regex.Pattern;
+import java.util.Objects;
+
+public class Email {
 
     private final String direccion;
 

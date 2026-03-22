@@ -13,14 +13,12 @@ public class Actividad {
     private String hora;
     private String ubicacion;
     private double precio;
-    private int plazas;
+    private int plazasTotales;
+    private int plazasDisponibles; 
     private String duracion;
     private String imagen;
 
-    public Actividad(Long id, String tipo, String descripcion, Nivel nivel,
-                     String organizador, String fecha, String hora,
-                     String ubicacion, double precio, int plazas,
-                     String duracion, String imagen) {
+    public Actividad(Long id, String tipo, String descripcion,Nivel nivel, String organizador, String fecha, String hora, String ubicacion, double precio, int plazasTotales, String duracion, String imagen) {
 
         this.id = id;
         this.tipo = tipo;
@@ -31,12 +29,12 @@ public class Actividad {
         this.hora = hora;
         this.ubicacion = ubicacion;
         this.precio = precio;
-        this.plazas = plazas;
+        this.plazasTotales = plazasTotales;
         this.duracion = duracion;
         this.imagen = imagen;
     }
 
-    // getters y setters (muy importante)
+    // getters
 
     public Long getId() { return id; }
     public String getTipo() { return tipo; }
@@ -48,7 +46,9 @@ public class Actividad {
     public String getHora() { return hora; }
     public String getUbicacion() { return ubicacion; }
     public double getPrecio() { return precio; }
-    public int getPlazas() { return plazas; }
+    public int getPlazasTotales() { return plazasTotales; }
+    public int getPlazasDisponibles() { return plazasDisponibles; }
+    public int setPlazasDisponibles(int plazasDisponibles) { return this.plazasDisponibles = plazasDisponibles;}
     public String getDuracion() { return duracion; }
     public String getImagen() { return imagen; }
 }

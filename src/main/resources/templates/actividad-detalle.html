@@ -68,7 +68,7 @@
               <i class="fa-solid fa-users"></i>
               <div>
                 <div class="fw-semibold">Participantes</div>
-                <div th:text="${actividad.plazas}">20</div>
+                <div th:text="${actividad.plazasDisponibles} + ' / ' + ${actividad.plazasTotales}">10 / 10</div>
               </div>
             </div>
 

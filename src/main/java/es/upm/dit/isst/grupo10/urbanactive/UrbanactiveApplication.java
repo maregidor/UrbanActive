@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UrbanactiveApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(UrbanactiveApplication.class, args);
+		SpringApplication.run(UrbanactiveApplication.class, a=rgs);
 	}
 
 }

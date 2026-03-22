@@ -24,8 +24,8 @@ public class ActividadController {
     }
 
     @GetMapping("/actividades/{id}")
-    public String verActividad(@PathVariable Long id, Model model) {
-        Actividad actividad = actividadService.getActividadById(id);
+    public String verDetalle(@PathVariable Long id, Model model) {
+        Actividad actividad = actividadService.findById(id);
         model.addAttribute("actividad", actividad);
         return "actividad-detalle";
     }

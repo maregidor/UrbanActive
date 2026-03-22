@@ -7,43 +7,48 @@ public class Actividad {
     private String descripcion;
     private Nivel nivel;
 
-    public Actividad(Long id, String tipo, String descripcion, Nivel nivel) {
+    // Campos para US2
+    private String organizador;
+    private String fecha;
+    private String hora;
+    private String ubicacion;
+    private double precio;
+    private int plazas;
+    private String duracion;
+    private String imagen;
+
+    public Actividad(Long id, String tipo, String descripcion, Nivel nivel,
+                     String organizador, String fecha, String hora,
+                     String ubicacion, double precio, int plazas,
+                     String duracion, String imagen) {
+
         this.id = id;
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.nivel = nivel;
+        this.organizador = organizador;
+        this.fecha = fecha;
+        this.hora = hora;
+        this.ubicacion = ubicacion;
+        this.precio = precio;
+        this.plazas = plazas;
+        this.duracion = duracion;
+        this.imagen = imagen;
     }
 
-    public Long getId() {
-        return id;
-    }
+    // getters y setters (muy importante)
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public String getTipo() { return tipo; }
+    public String getDescripcion() { return descripcion; }
+    public Nivel getNivel() { return nivel; }
 
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Nivel getNivel() {
-        return nivel;
-    }
-
-    public void setNivel(Nivel nivel) {
-        this.nivel = nivel;
-    }
-
+    public String getOrganizador() { return organizador; }
+    public String getFecha() { return fecha; }
+    public String getHora() { return hora; }
+    public String getUbicacion() { return ubicacion; }
+    public double getPrecio() { return precio; }
+    public int getPlazas() { return plazas; }
+    public String getDuracion() { return duracion; }
+    public String getImagen() { return imagen; }
 }

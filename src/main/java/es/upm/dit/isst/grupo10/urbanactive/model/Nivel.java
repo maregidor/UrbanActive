@@ -30,4 +30,20 @@ public class Nivel {
         return Objects.hash(valor);
     }
 
+    @Override
+    public String toString() {
+        String category;
+        int val = (int) Math.round(valor);
+        if (val <= 3) {
+            category = "Principiante";
+        } else if (val <= 6) {
+            category = "Intermedio";
+        } else if (val <= 8) {
+            category = "Avanzado";
+        } else {
+            category = "Experto";
+        }
+        return category + " (" + val + "/10)";
+    }
+
 }

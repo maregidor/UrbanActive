@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ActividadController {
@@ -36,5 +37,10 @@ public class ActividadController {
         model.addAttribute("actividad", actividadService.getActividadById(id));
         model.addAttribute("mensaje", reservada ? "Reserva realizada correctamente" : "No quedan plazas disponibles");
         return "actividad-detalle";
+    }
+
+    @GetMapping("/actividades/{id}/reservar-sesion")
+    public String reservarSesion(@PathVariable Long id, Model model) {
+        return "redirect:/reservas/actividad/" + id;
     }
 }

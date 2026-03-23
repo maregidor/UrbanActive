@@ -123,7 +123,7 @@
           </div>
         </div>
 
-        <form th:action="@{/actividades/{id}/reservar(id=${actividad.id})}" method="post">
+        <form th:action="@{/reservas/actividad/{id}(id=${actividad.id})}" method="get">
           <button type="submit" class="reserve-btn">Reservar plaza</button>
         </form>
       </aside>

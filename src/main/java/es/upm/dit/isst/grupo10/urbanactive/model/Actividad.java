@@ -4,6 +4,7 @@ public class Actividad {
 
     private Long id;
     private String tipo;
+    private String titulo;
     private String descripcion;
     private Nivel nivel;
 
@@ -18,10 +19,11 @@ public class Actividad {
     private String duracion;
     private String imagen;
 
-    public Actividad(Long id, String tipo, String descripcion,Nivel nivel, String organizador, String fecha, String hora, String ubicacion, double precio, int plazasTotales, String duracion, String imagen) {
+    public Actividad(Long id, String tipo, String titulo, String descripcion,Nivel nivel, String organizador, String fecha, String hora, String ubicacion, double precio, int plazasTotales, String duracion, String imagen) {
 
         this.id = id;
         this.tipo = tipo;
+        this.titulo = titulo;
         this.descripcion = descripcion;
         this.nivel = nivel;
         this.organizador = organizador;
@@ -30,6 +32,7 @@ public class Actividad {
         this.ubicacion = ubicacion;
         this.precio = precio;
         this.plazasTotales = plazasTotales;
+        this.plazasDisponibles = plazasTotales;
         this.duracion = duracion;
         this.imagen = imagen;
     }
@@ -38,6 +41,7 @@ public class Actividad {
 
     public Long getId() { return id; }
     public String getTipo() { return tipo; }
+    public String getTitulo() { return titulo; }
     public String getDescripcion() { return descripcion; }
     public Nivel getNivel() { return nivel; }
 

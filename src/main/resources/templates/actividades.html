@@ -10,8 +10,9 @@
 
 <ul>
     <li th:each="actividad : ${actividades}">
-        <span th:text="${actividad.tipo}">Tipo</span> -
-        <span th:text="${actividad.descripcion}">Descripción</span>
+        <span th:text="${actividad.titulo}">Título</span> -
+        <span th:text="${actividad.descripcion}">Descripción</span> 
+        <small class="text-muted">(<span th:text="${actividad.tipo}">Tipo</span>)</small>
         <a th:href="@{/actividades/{id}(id=${actividad.id})}">Seleccionar</a>
     </li>
 </ul>

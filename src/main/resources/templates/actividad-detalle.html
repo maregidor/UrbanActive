@@ -38,10 +38,11 @@
 
         <div class="p-4">
           <div class="small text-muted mb-2">
-            Actividad <i class="fa-solid fa-earth-europe"></i> Pública
+            <span th:text="${actividad.tipo}">Tipo</span>
+            <span class="badge bg-success ms-2">Pública</span>
           </div>
 
-          <h1 class="activity-title mb-2" th:text="${actividad.tipo}">Nombre actividad</h1>
+          <h1 class="activity-title mb-2" th:text="${actividad.titulo} + ' - ' + ${actividad.descripcion}">Nombre actividad</h1>
 
           <p class="activity-subtitle mb-4" th:text="${actividad.organizador}">
             Organizador

@@ -1,40 +1,45 @@
 package es.upm.dit.isst.grupo10.urbanactive.service;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
+import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
 import org.springframework.stereotype.Service;
-import es.upm.dit.isst.grupo10.urbanactive.model.Nivel;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ActividadService {
 
-    private final List<Actividad> actividades = new ArrayList<>();
+    private final ActividadRepository actividadRepository;
 
-    public ActividadService() {
-        actividades.add(new Actividad(1L, "Running", "Running por El Retiro", "Salida de running por El Retiro", new Nivel(10.00), "Juan Perez", "26/04/2026", "14:00", "Parque el Retiro", 12.0,  10, "30 minutos", "/img/running.jpg"));
-        actividades.add(new Actividad(2L, "Yoga", "Yoga al Aire Libre", "Sesión de yoga al aire libre", new Nivel (8.00), "Lucía Lopez", "30/04/2026", "18:00", "Parque del Oeste", 9.5,  5, "1 hora", "/img/yoga.jpg"));
-        actividades.add(new Actividad(3L, "Ciclismo", "Ruta Urbana en Bicicleta", "Ruta urbana en bicicleta", new Nivel (5.00), "Juan Moreno", "6/05/2026", "19:00", "El Pardo", 0,  14, "1 hora y 30 minutos", "/img/ciclismo.jpg"));
+    public ActividadService(ActividadRepository actividadRepository) {
+        this.actividadRepository = actividadRepository;
     }
 
     public List<Actividad> getActividades() {
-        return actividades;
+        return StreamSupport.stream(actividadRepository.findAll().spliterator(), false)
+                            .collect(Collectors.toList());
     }
 
     public Actividad getActividadById(Long id) {
-        return actividades.stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return actividadRepository.findById(id).orElse(null);
     }
 
     public boolean reservarActividad(Long id) {
         Actividad actividad = getActividadById(id);
+        
         if (actividad != null && actividad.getPlazasDisponibles() > 0) {
             actividad.setPlazasDisponibles(actividad.getPlazasDisponibles() - 1);
+            
+            actividadRepository.save(actividad); 
             return true;
         }
         return false;
+    }
+
+    // 5. Método extra para que tú puedas guardar nuevas actividades desde tu US
+    public Actividad guardarActividad(Actividad actividad) {
+        return actividadRepository.save(actividad);
     }
 }

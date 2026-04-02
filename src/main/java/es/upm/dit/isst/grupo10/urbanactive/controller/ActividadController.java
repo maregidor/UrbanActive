@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ActividadController {
@@ -27,12 +26,19 @@ public class ActividadController {
     @GetMapping("/actividades/{id}")
     public String verDetalle(@PathVariable Long id, Model model) {
         Actividad actividad = actividadService.getActividadById(id);
+        if (actividad == null) {
+            return "redirect:/actividades";
+        }
         model.addAttribute("actividad", actividad);
         return "actividad-detalle";
     }
 
     @PostMapping("/actividades/{id}/reservar")
     public String reservarActividad(@PathVariable Long id, Model model) {
+        Actividad actividad = actividadService.getActividadById(id);
+        if (actividad == null) {
+            return "redirect:/actividades";
+        }
         boolean reservada = actividadService.reservarActividad(id);
         model.addAttribute("actividad", actividadService.getActividadById(id));
         model.addAttribute("mensaje", reservada ? "Reserva realizada correctamente" : "No quedan plazas disponibles");

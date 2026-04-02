@@ -1,10 +1,21 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
 
+        @EmbeddedId
         private Email email;
+
         private String nombre;
+
+        @Embedded
         private Nivel nivelExperiencia;
+
+        public Usuario() {
+        }
 
         public Usuario(Email email, String nombre, Nivel nivelExperiencia) {
                 this.email = email;

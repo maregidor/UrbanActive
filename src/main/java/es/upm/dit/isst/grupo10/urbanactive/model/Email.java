@@ -1,15 +1,21 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
+import jakarta.persistence.*;
 import java.util.regex.Pattern;
 import java.util.Objects;
+import java.io.Serializable;
 
-public class Email {
+@Embeddable
+public class Email implements Serializable {
 
     private final String direccion;
 
-    // Expresión regular para validar el formato
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     private static final Pattern PATTERN = Pattern.compile(EMAIL_REGEX);
+
+    protected Email() {
+        this.direccion = null; 
+    }
 
     public Email (String direccion) {
         if (direccion == null || direccion.trim().isEmpty()) {

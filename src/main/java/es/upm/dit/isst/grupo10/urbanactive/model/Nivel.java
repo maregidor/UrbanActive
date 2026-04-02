@@ -1,10 +1,17 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
+import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Nivel {
+@Embeddable
+public class Nivel implements Serializable {
 
-    private final double valor; 
+    private double valor; 
+
+    public Nivel() {
+        this.valor = 0.0;
+    }
 
     public Nivel(double valor) {
         if (valor < 0.0 || valor > 10.0) {
@@ -15,6 +22,10 @@ public class Nivel {
 
     public Double getValor() {
         return valor;
+    }
+
+    public void setValor(double valor) {
+        this.valor = valor;
     }
 
     @Override

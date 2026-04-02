@@ -95,12 +95,13 @@
             <span>Precio</span>
             <span class="fw-bold text-success fs-4" th:text="${actividad.precio > 0 ? actividad.precio + ' €' : 'Gratis'}">0 €</span>
           </div>
+          <div class="d-flex justify-content-between mb-4">
+            <span>Plazas disponibles</span>
+            <span class="fw-bold fs-4" th:text="${actividad.plazasDisponibles} + '/' + ${actividad.plazasTotales}">20/20</span>
+          </div>
 
-          <form th:action="@{/actividades/{id}/reservar(id=${actividad.id})}" method="post">
-            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow" 
-                    th:disabled="${actividad.plazasDisponibles <= 0}">
-              <span th:text="${actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles'}">Reservar</span>
-            </button>
+          <form th:action="@{/reservas/formulario/{id}(id=${actividad.id})}" method="get">
+            <button type="submit" class="reserve-btn">Reservar plaza</button>
           </form>
           
           <p class="text-center small text-muted mt-3">Al reservar, aceptas nuestras normas de uso urbano.</p>

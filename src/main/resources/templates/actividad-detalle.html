@@ -68,13 +68,21 @@
           </div>
 
           <div class="info-mini">
-            <i class="fa-regular fa-star"></i>
+            <i class="fa-regular fa-star text-primary"></i>
             <div>
               <div class="fw-semibold">Nivel</div>
               <div th:text="${actividad.nivel}"></div>
             </div>
           </div>
 
+        </div>
+
+        <div class="info-mini">
+          <i class="fa-regular fa-star"></i>
+          <div>
+            <div class="fw-semibold">Valoración</div>
+            <div th:text="${actividad.organizacion.valoracion}"></div>
+          </div>
         </div>
 
         <div class="card-custom">

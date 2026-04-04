@@ -16,7 +16,6 @@ public class DataInitializer implements CommandLineRunner {
     private final OrganizacionRepository organizacionRepository;
     private final EspacioPublicoRepository espacioRepository;
 
-    // Inyectamos todos los repositorios por constructor
     public DataInitializer(ActividadRepository actividadRepository, 
                            UsuarioRepository usuarioRepository, 
                            OrganizacionRepository organizacionRepository,
@@ -32,49 +31,85 @@ public class DataInitializer implements CommandLineRunner {
         
         System.out.println("Cargando datos de prueba en la BBDD...");
 
-        // 1. Crear un Espacio Público
-        EspacioPublico retiro = new EspacioPublico("Parque del Retiro", "Parque", "Madrid Centro");
-        espacioRepository.save(retiro);
+        // 1. ESPACIOS PÚBLICOS
+        EspacioPublico retiro = espacioRepository.save(new EspacioPublico("Parque del Retiro", "Parque", "Madrid Centro"));
+        EspacioPublico canal = espacioRepository.save(new EspacioPublico("Instalaciones Canal", "Polideportivo", "Chamberí"));
+        EspacioPublico madridRio = espacioRepository.save(new EspacioPublico("Madrid Río", "Parque", "Arganzuela"));
 
-        // 2. Crear una Organización (con su Value Object Identificacion)
-        Identificacion cifMadrid = new Identificacion("CIF", "B12345678");
-        Organizacion madridActivo = new Organizacion(cifMadrid, "Madrid Activo SL");
-        organizacionRepository.save(madridActivo);
-
-        // 3. Crear un Usuario (con su Email como ID y Nivel)
-        Email emailUser = new Email("usuario1@gmail.com");
-        Nivel nivelIniciado = new Nivel(5.0); // Suponiendo que Nivel guarda un double
-        Usuario juan = new Usuario(emailUser, "Juan Pérez", nivelIniciado);
-        usuarioRepository.save(juan);
-
-        // 4. Crear la Actividad principal
-        Actividad yoga = new Actividad();
-        yoga.setTitulo("Yoga al amanecer");
-        yoga.setTipo("Bienestar");
-        yoga.setDescripcion("Sesión de yoga para todos los niveles frente al estanque.");
-        yoga.setNivel(new Nivel(3.0));
-        yoga.setFecha(LocalDate.now().plusDays(2));
-        yoga.setHora(LocalTime.of(8, 30));
-        yoga.setDuracion("60 min");
-        yoga.setImagen("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b");
+        // 2. TRES ORGANIZADORES (Organizaciones con sus valoraciones)
+        Organizacion madridActivo = organizacionRepository.save(new Organizacion(
+            new Identificacion("CIF", "B12345678"), "Madrid Activo SL", new Valoracion(4.5, 100)));
         
-        // Asignamos el organizador (usando la opción de columnas separadas)
-        yoga.setOrganizacion(madridActivo);
-        yoga.setPrecio(10.0); // Como es organización, ponemos precio
-        
-        // Asignamos el lugar
-        yoga.setEspacioPublico(retiro);
-        
-        // Establecemos las plazas disponibles
-        yoga.setPlazasTotales(20); // 20 plazas totales
-        yoga.setPlazasDisponibles(20); // 20 plazas disponibles inicialmente
-        
-        // Añadimos a Juan como participante
-        yoga.getParticipantes().add(juan);
+        Organizacion crossfitMad = organizacionRepository.save(new Organizacion(
+            new Identificacion("CIF", "B87654321"), "Crossfit Madrid", new Valoracion(4.9, 250)));
+            
+        Organizacion urbanYoga = organizacionRepository.save(new Organizacion(
+            new Identificacion("CIF", "B11223344"), "Urban Yoga Studio", new Valoracion(2.2, 50)));
 
-        // Guardamos la actividad (esto creará también la relación en la tabla de unión)
-        actividadRepository.save(yoga);
+        // 3. USUARIO (Participante)
+        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0)));
 
-        System.out.println("¡Datos cargados con éxito! Actividad ID: " + yoga.getId());
+        // 4. SEIS ACTIVIDADES DISTINTAS
+
+        // Actividad 1: Yoga al amanecer (Barata, Alta valoración, Retiro)
+        actividadRepository.save(crearActividad("Yoga al amanecer", "Bienestar", 8.50, 2.0, 
+            LocalDate.now().plusDays(2), LocalTime.of(8, 30), 
+            urbanYoga, retiro, 40.4153, -3.6839, 20, 
+            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b"));
+
+        // Actividad 2: HIIT Extremo (Cara, Muy valorada, Canal, Hoy)
+        actividadRepository.save(crearActividad("HIIT Extremo", "Fuerza", 15.0, 8.5, 
+            LocalDate.now(), LocalTime.of(19, 0), 
+            crossfitMad, canal, 40.4385, -3.7071, 10, 
+            "https://images.unsplash.com/photo-1534438327276-14e5300c3a48"));
+
+        // Actividad 3: Running 5K (Gratis, Valoración media, Madrid Río)
+        actividadRepository.save(crearActividad("Running 5K técnica", "Cardio", 0.0, 4.0, 
+            LocalDate.now().plusDays(3), LocalTime.of(10, 0), 
+            madridActivo, madridRio, 40.4033, -3.7162, 50, 
+            "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8"));
+
+        // Actividad 4: Pilates Park (Precio medio, Retiro)
+        actividadRepository.save(crearActividad("Pilates Park", "Bienestar", 12.0, 3.5, 
+            LocalDate.now().plusDays(5), LocalTime.of(11, 0), 
+            urbanYoga, retiro, 40.4160, -3.6840, 15, 
+            "https://images.unsplash.com/photo-1518611012118-696072aa579a"));
+
+        // Actividad 5: Entrenamiento Funcional (Madrid Activo, Canal)
+        actividadRepository.save(crearActividad("Funcional Urban", "Fuerza", 5.0, 6.0, 
+            LocalDate.now().plusDays(1), LocalTime.of(18, 30), 
+            madridActivo, canal, 40.4390, -3.7080, 12, 
+            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438"));
+
+        // Actividad 6: Zumba al aire libre (Gratis, Madrid Río)
+        actividadRepository.save(crearActividad("Zumba Urban", "Ocio", 0.0, 3.0, 
+            LocalDate.now().plusDays(4), LocalTime.of(12, 0), 
+            madridActivo, madridRio, 40.4045, -3.7170, 40, 
+            "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e"));
+
+        System.out.println("¡Datos cargados con éxito! Se han creado 6 actividades y 3 organizaciones.");
+    }
+
+    // Método auxiliar para limpiar el código de creación de actividades
+    private Actividad crearActividad(String titulo, String tipo, Double precio, Double nivelVal, 
+                                     LocalDate fecha, LocalTime hora, Organizacion org, 
+                                     EspacioPublico esp, Double lat, Double lon, int plazas, String img) {
+        Actividad a = new Actividad();
+        a.setTitulo(titulo);
+        a.setTipo(tipo);
+        a.setPrecio(precio);
+        a.setNivel(new Nivel(nivelVal));
+        a.setFecha(fecha);
+        a.setHora(hora);
+        a.setOrganizacion(org);
+        a.setEspacioPublico(esp);
+        a.setLatitud(lat);
+        a.setLongitud(lon);
+        a.setPlazasTotales(plazas);
+        a.setPlazasDisponibles(plazas);
+        a.setImagen(img);
+        a.setDuracion("60 min");
+        a.setDescripcion("Actividad de " + tipo + " organizada por " + org.getNombre());
+        return a;
     }
 }

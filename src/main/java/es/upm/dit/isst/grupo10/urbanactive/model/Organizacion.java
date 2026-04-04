@@ -11,11 +11,15 @@ public class Organizacion {
 
     private String nombre;
 
+    @Embedded
+    private Valoracion valoracion;
+
     public Organizacion() {}
 
-    public Organizacion(Identificacion identificacion, String nombre) {
+    public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion) {
         this.identificacion = identificacion;
         this.nombre = nombre;
+        this.valoracion = valoracion;
     }
 
     public Identificacion getIdentificacion() {
@@ -33,4 +37,15 @@ public class Organizacion {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public Valoracion getValoracion() {
+        return valoracion;
+    }
+
+    public void setValoracion(Valoracion valoracion) {
+        this.valoracion = valoracion;
+    }
 }
+
+
+

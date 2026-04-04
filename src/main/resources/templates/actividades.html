@@ -19,21 +19,22 @@
         }
         .card-activity:hover { 
             transform: translateY(-8px); 
-            shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             border-color: #0d6efd;
         }
         .img-container { height: 210px; object-fit: cover; }
         .top-nav { background: white; border-bottom: 1px solid #f0f0f0; }
         .info-line { font-size: 0.9rem; color: #666; display: flex; align-items: center; margin-bottom: 0.5rem; }
+        /* El icono de la info-line por defecto ya es azul corporativo (#0d6efd) */
         .info-line i { width: 20px; color: #0d6efd; margin-right: 8px; }
         .price-tag { font-size: 1.1rem; font-weight: 700; color: #198754; }
     </style>
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">UrbanActive</a>
+            <a class="navbar-brand fw-bold" href="/">UrbanActive</a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="/actividades">Actividades</a>
                 <a class="nav-link" href="/reservas/mis-reservas">Mis Reservas</a>
@@ -42,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container py-5">
         <div class="row mb-5">
             <div class="col-lg-8">
                 <h1 class="fw-bold display-5">Actividades disponibles</h1>
@@ -76,9 +77,15 @@
                             <span th:text="${actividad.espacioPublico != null ? actividad.espacioPublico.nombre : 'Ubicación pendiente'}">Espacio</span>
                         </div>
 
-                        <div class="info-line mb-4">
+                        <div class="info-line">
                             <i class="far fa-calendar-alt"></i>
                             <span class="fw-semibold" th:text="${actividad.fecha} + ' · ' + ${actividad.hora}">Fecha y Hora</span>
+                        </div>
+
+                        <div class="info-line" th:if="${actividad.organizacion != null and actividad.organizacion.valoracion != null}">
+                            <i class="fas fa-star text-primary"></i> 
+                            <span class="fw-semibold text-muted" th:text="${actividad.organizacion.valoracion.estrellas}">⭐⭐⭐⭐</span>
+                            <span class="ms-1 text-muted small" th:text="'(' + ${actividad.organizacion.valoracion.puntuacion} + ')'">4.5</span>
                         </div>
 
                         <div class="info-line mb-4">

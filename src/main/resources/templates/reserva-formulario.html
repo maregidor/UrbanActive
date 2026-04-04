@@ -52,24 +52,23 @@
 
                         <form th:action="@{/reservas/procesar}" method="post">
                             <input type="hidden" name="actividadId" th:value="${actividad.id}">
-                            <input type="hidden" name="sesionId" th:value="${sesion.id}">
 
                             <div class="mb-4">
-                                <h5>Datos del Participante</h5>
+                                <h5>Confirmar Reserva</h5>
                                 
                                 <div class="mb-3">
-                                    <label for="emailUsuario" class="form-label">Email *</label>
-                                    <input type="email" 
-                                           class="form-control" 
-                                           id="emailUsuario" 
-                                           name="emailUsuario" 
-                                           required
-                                           th:value="${emailUsuario}"
-                                           placeholder="tu@email.com">
-                                    <div class="form-text">
-                                        Usa tu email para identificar tu reserva.
-                                    </div>
+                                    <p><strong>Usuario:</strong> <span th:text="${usuario.nombre}">Nombre Usuario</span></p>
+                                    <p><strong>Email:</strong> <span th:text="${usuario.email.direccion}">email@usuario.com</span></p>
                                 </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <strong>Información importante:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Las plazas son limitadas y se asignan por orden de reserva</li>
+                                    <li>Podrás cancelar tu reserva hasta 2 horas antes del inicio de la actividad</li>
+                                    <li th:if="${actividad.precio > 0}">El pago se realizará al llegar a la actividad</li>
+                                </ul>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

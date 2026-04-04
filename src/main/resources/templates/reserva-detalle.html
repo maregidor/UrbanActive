@@ -66,14 +66,17 @@
                     <div class="card-body">
                         
                         <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="info-section p-3">
-                                    <h5 class="mb-3">
-                                        <i class="bi bi-person-badge"></i>
-                                        Datos del Participante
-                                    </h5>
-                                    <p class="mb-2"><strong>Email:</strong> <span th:text="${reserva.emailUsuario.direccion}">email</span></p>
-                                    <p class="mb-0"><strong>ID Reserva:</strong> <span th:text="${reserva.id}">ID</span></p>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="info-section p-3">
+                                        <h5 class="mb-3">
+                                            <i class="bi bi-person-badge"></i>
+                                            Datos del Participante
+                                        </h5>
+                                        <p class="mb-2"><strong>Usuario:</strong> <span th:text="${reserva.usuario.nombre}">Nombre</span></p>
+                                        <p class="mb-2"><strong>Email:</strong> <span th:text="${reserva.usuario.email.direccion}">email</span></p>
+                                        <p class="mb-0"><strong>ID Reserva:</strong> <span th:text="${reserva.id}">ID</span></p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">

@@ -31,12 +31,13 @@
 </head>
 <body class="bg-light">
 
-    <nav class="top-nav sticky-top shadow-sm mb-4">
-        <div class="container d-flex justify-content-between align-items-center py-3">
-            <div class="fw-bold fs-3 text-primary"><i class="fas fa-running me-2"></i>UrbanActive</div>
-            <div class="d-flex gap-2">
-                <a th:href="@{/actividades}" class="btn btn-primary rounded-pill px-4 fw-semibold">Actividades</a>
-                <a href="#" class="btn btn-outline-secondary rounded-pill fw-semibold">Mi Perfil</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">UrbanActive</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/actividades">Actividades</a>
+                <a class="nav-link" href="/reservas/mis-reservas">Mis Reservas</a>
+                <a class="nav-link" href="/logout">Cerrar Sesión</a>
             </div>
         </div>
     </nav>
@@ -78,6 +79,11 @@
                         <div class="info-line mb-4">
                             <i class="far fa-calendar-alt"></i>
                             <span class="fw-semibold" th:text="${actividad.fecha} + ' · ' + ${actividad.hora}">Fecha y Hora</span>
+                        </div>
+
+                        <div class="info-line mb-4">
+                            <i class="fas fa-users"></i>
+                            <span class="fw-semibold" th:text="${actividad.plazasDisponibles} + '/' + ${actividad.plazasTotales} + ' plazas'">20/20 plazas</span>
                         </div>
 
                         <div class="d-grid">

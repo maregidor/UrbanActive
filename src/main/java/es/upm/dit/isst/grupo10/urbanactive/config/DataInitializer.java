@@ -65,6 +65,10 @@ public class DataInitializer implements CommandLineRunner {
         // Asignamos el lugar
         yoga.setEspacioPublico(retiro);
         
+        // Establecemos las plazas disponibles
+        yoga.setPlazasTotales(20); // 20 plazas totales
+        yoga.setPlazasDisponibles(20); // 20 plazas disponibles inicialmente
+        
         // Añadimos a Juan como participante
         yoga.getParticipantes().add(juan);
 

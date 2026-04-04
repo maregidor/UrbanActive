@@ -46,8 +46,7 @@
                         
                         <div class="alert alert-success text-start">
                             <i class="bi bi-envelope"></i>
-                            <strong>Confirmación enviada:</strong> Hemos enviado un email de confirmación a 
-                            <span th:text="${reserva.emailUsuario.direccion}">tu@email.com</span>
+                            <strong>Reserva confirmada para:</strong> <span th:text="${reserva.usuario.nombre}">Nombre Usuario</span> (<span th:text="${reserva.usuario.email.direccion}">email</span>)
                         </div>
                     </div>
                 </div>

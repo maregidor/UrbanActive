@@ -127,24 +127,14 @@
 
           </div>
 
-          <div th:if="${contexto == null or contexto.traffic() == null}" class="text-muted small">
-            No se pudo calcular el trayecto
-          </div>
-        </div>
-
-      </div>
-
-      <!-- DESCRIPCIÓN -->
-      <div class="sidebar-card">
-        <div class="fw-semibold mb-2">Descripción</div>
-        <div th:text="${actividad.descripcion}"></div>
-      </div>
-
-      <!-- EXTRA -->
-      <div class="sidebar-card d-flex justify-content-between">
-        <div>
-          <div class="fw-semibold">Duración</div>
-          <div th:text="${actividad.duracion}"></div>
+          <form th:action="@{/actividades/{id}/reservar(id=${actividad.id})}" method="post">
+            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow" 
+                    th:disabled="${actividad.plazasDisponibles <= 0}">
+              <span th:text="${actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles'}">Reservar</span>
+            </button>
+          </form>
+          
+          <p class="text-center small text-muted mt-3">Al reservar, aceptas nuestras normas de uso urbano.</p>
         </div>
 
         <div class="text-end">

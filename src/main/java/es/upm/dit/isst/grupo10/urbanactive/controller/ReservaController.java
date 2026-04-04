@@ -1,137 +1,167 @@
-// package es.upm.dit.isst.grupo10.urbanactive.controller;
+package es.upm.dit.isst.grupo10.urbanactive.controller;
 
-// import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
-// import es.upm.dit.isst.grupo10.urbanactive.model.Reserva;
-// import es.upm.dit.isst.grupo10.urbanactive.model.Sesion;
-// import es.upm.dit.isst.grupo10.urbanactive.service.ActividadService;
-// import es.upm.dit.isst.grupo10.urbanactive.service.ReservaService;
-// import org.springframework.stereotype.Controller;
-// import org.springframework.ui.Model;
-// import org.springframework.web.bind.annotation.*;
-// import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
+import es.upm.dit.isst.grupo10.urbanactive.model.Reserva;
+import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
+import es.upm.dit.isst.grupo10.urbanactive.service.ReservaService;
+import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-// import java.util.List;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// @Controller
-// @RequestMapping("/reservas")
-// public class ReservaController {
+import java.util.List;
+import java.util.Optional;
 
-//     private final ReservaService reservaService;
-//     private final ActividadService actividadService;
+@Controller
+@RequestMapping("/reservas")
+public class ReservaController {
 
-//     public ReservaController(ReservaService reservaService, ActividadService actividadService) {
-//         this.reservaService = reservaService;
-//         this.actividadService = actividadService;
-//     }
+    private final ReservaService reservaService;
+    private final ActividadRepository actividadRepository;
 
-//     @GetMapping("/")
-//     public String reservasHome(Model model) {
-//         return "redirect:/actividades";
-//     }
+    public ReservaController(ReservaService reservaService, ActividadRepository actividadRepository) {
+        this.reservaService = reservaService;
+        this.actividadRepository = actividadRepository;
+    }
 
-//     @GetMapping("/actividad/{actividadId}")
-//     public String mostrarSesionesActividad(@PathVariable Long actividadId, Model model) {
-//         Actividad actividad = actividadService.getActividadById(actividadId);
-//         if (actividad == null) {
-//             return "redirect:/actividades";
-//         }
+    @GetMapping("/")
+    public String reservasHome(Model model) {
+        return "redirect:/actividades";
+    }
 
-//         List<Sesion> sesiones = reservaService.getSesionesPorActividad(actividadId);
-//         model.addAttribute("actividad", actividad);
-//         model.addAttribute("sesiones", sesiones);
-//         return "reserva-sesiones";
-//     }
+    @GetMapping("/actividad/{actividadId}")
+    public String mostrarSesionesActividad(@PathVariable Long actividadId, Model model) {
+        Optional<Actividad> actividadOpt = actividadRepository.findById(actividadId);
+        if (actividadOpt.isEmpty()) {
+            return "redirect:/actividades";
+        }
 
-//     @GetMapping("/formulario/{actividadId}/{sesionId}")
-//     public String mostrarFormularioReserva(@PathVariable Long actividadId, 
-//                                          @PathVariable Long sesionId, 
-//                                          Model model) {
-//         Actividad actividad = actividadService.getActividadById(actividadId);
-//         Sesion sesion = reservaService.getSesionById(sesionId).orElse(null);
+        model.addAttribute("actividad", actividadOpt.get());
+        return "reserva-sesiones";
+    }
 
-//         if (actividad == null || sesion == null) {
-//             return "redirect:/actividades";
-//         }
+    @GetMapping("/formulario/{actividadId}")
+    public String mostrarFormularioReserva(@PathVariable Long actividadId, 
+                                         Model model,
+                                         HttpSession session) {
+        Optional<Actividad> actividadOpt = actividadRepository.findById(actividadId);
+        if (actividadOpt.isEmpty()) {
+            return "redirect:/actividades";
+        }
 
-//         model.addAttribute("actividad", actividad);
-//         model.addAttribute("sesion", sesion);
-//         return "reserva-formulario";
-//     }
+        // Obtener usuario logueado de la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
 
-//     @PostMapping("/procesar")
-//     public String procesarReserva(@RequestParam String emailUsuario,
-//                                 @RequestParam Long actividadId,
-//                                 @RequestParam Long sesionId,
-//                                 RedirectAttributes redirectAttributes) {
+        model.addAttribute("actividad", actividadOpt.get());
+        model.addAttribute("usuario", usuario);
+        return "reserva-formulario-simple";
+    }
+
+    @PostMapping("/procesar")
+    public String procesarReserva(@RequestParam Long actividadId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
         
-//         ReservaService.ReservaResultado resultado = reservaService.reservarPlaza(emailUsuario, actividadId, sesionId);
-
-//         if (resultado.isExito()) {
-//             redirectAttributes.addFlashAttribute("mensajeExito", resultado.getMensaje());
-//             redirectAttributes.addFlashAttribute("reserva", resultado.getReserva());
-//             return "redirect:/reservas/confirmacion/" + resultado.getReserva().getId();
-//         } else {
-//             redirectAttributes.addFlashAttribute("mensajeError", resultado.getMensaje());
-//             redirectAttributes.addFlashAttribute("emailUsuario", emailUsuario);
-//             return "redirect:/reservas/formulario/" + actividadId + "/" + sesionId;
-//         }
-//     }
-
-//     @GetMapping("/confirmacion/{reservaId}")
-//     public String mostrarConfirmacion(@PathVariable Long reservaId, Model model) {
-//         Reserva reserva = reservaService.getReservaById(reservaId);
-//         if (reserva == null) {
-//             return "redirect:/actividades";
-//         }
-
-//         Actividad actividad = actividadService.getActividadById(reserva.getActividadId());
-//         Sesion sesion = reservaService.getSesionById(reserva.getSesionId()).orElse(null);
-
-//         model.addAttribute("reserva", reserva);
-//         model.addAttribute("actividad", actividad);
-//         model.addAttribute("sesion", sesion);
-//         return "reserva-confirmacion";
-//     }
-
-//     @GetMapping("/mis-reservas")
-//     public String mostrarMisReservas(@RequestParam(required = false) String email, Model model) {
-//         if (email != null && !email.trim().isEmpty()) {
-//             List<Reserva> reservas = reservaService.getReservasPorUsuario(email);
-//             model.addAttribute("reservas", reservas);
-//             model.addAttribute("emailUsuario", email);
-//         }
-//         return "mis-reservas";
-//     }
-
-//     @PostMapping("/cancelar/{reservaId}")
-//     public String cancelarReserva(@PathVariable Long reservaId,
-//                                  @RequestParam String emailUsuario,
-//                                  RedirectAttributes redirectAttributes) {
+        // Obtener usuario logueado de la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
         
-//         boolean cancelada = reservaService.cancelarReserva(reservaId, emailUsuario);
+        boolean exito = reservaService.reservarPlaza(usuario, actividadId);
+
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Reserva realizada correctamente! Tu plaza ha sido confirmada.");
+            return "redirect:/reservas/exito";
+        } else {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pudo realizar la reserva. Verifica que haya plazas disponibles.");
+            return "redirect:/reservas/formulario/" + actividadId;
+        }
+    }
+
+    @GetMapping("/exito")
+    public String mostrarReservaExito(Model model) {
+        return "reserva-exito";
+    }
+
+    @GetMapping("/confirmacion/{reservaId}")
+    public String mostrarConfirmacion(@PathVariable Long reservaId, Model model) {
+        Reserva reserva = reservaService.getReservaById(reservaId);
+        if (reserva == null) {
+            return "redirect:/actividades";
+        }
+
+        Optional<Actividad> actividadOpt = actividadRepository.findById(reserva.getActividadId());
+        if (actividadOpt.isEmpty()) {
+            return "redirect:/actividades";
+        }
+
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("actividad", actividadOpt.get());
+        return "reserva-confirmacion";
+    }
+
+    @GetMapping("/mis-reservas")
+    public String mostrarMisReservas(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        List<Reserva> reservas = reservaService.getReservasPorUsuario(usuario);
+        model.addAttribute("reservas", reservas);
+        model.addAttribute("usuario", usuario);
+        return "mis-reservas";
+    }
+
+    @PostMapping("/cancelar/{reservaId}")
+    public String cancelarReserva(@PathVariable Long reservaId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
         
-//         if (cancelada) {
-//             redirectAttributes.addFlashAttribute("mensajeExito", "Reserva cancelada correctamente");
-//         } else {
-//             redirectAttributes.addFlashAttribute("mensajeError", "No se pudo cancelar la reserva. Verifica que la reserva exista y te pertenezca.");
-//         }
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
         
-//         return "redirect:/reservas/mis-reservas?email=" + emailUsuario;
-//     }
+        boolean cancelada = reservaService.cancelarReserva(reservaId, usuario);
+        
+        if (cancelada) {
+            redirectAttributes.addFlashAttribute("mensajeExito", "Reserva cancelada correctamente");
+        } else {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pudo cancelar la reserva. Verifica que la reserva exista y te pertenezca.");
+        }
+        
+        return "redirect:/reservas/mis-reservas";
+    }
 
-//     @GetMapping("/detalle/{reservaId}")
-//     public String verDetalleReserva(@PathVariable Long reservaId, Model model) {
-//         Reserva reserva = reservaService.getReservaById(reservaId);
-//         if (reserva == null) {
-//             return "redirect:/actividades";
-//         }
+    @GetMapping("/detalle/{reservaId}")
+    public String verDetalleReserva(@PathVariable Long reservaId, 
+                                   HttpSession session,
+                                   Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
 
-//         Actividad actividad = actividadService.getActividadById(reserva.getActividadId());
-//         Sesion sesion = reservaService.getSesionById(reserva.getSesionId()).orElse(null);
+        Reserva reserva = reservaService.getReservaById(reservaId);
+        if (reserva == null || !reserva.getUsuario().equals(usuario)) {
+            return "redirect:/reservas/mis-reservas";
+        }
 
-//         model.addAttribute("reserva", reserva);
-//         model.addAttribute("actividad", actividad);
-//         model.addAttribute("sesion", sesion);
-//         return "reserva-detalle";
-//     }
-// }
+        Optional<Actividad> actividadOpt = actividadRepository.findById(reserva.getActividadId());
+        if (actividadOpt.isEmpty()) {
+            return "redirect:/reservas/mis-reservas";
+        }
+
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("actividad", actividadOpt.get());
+        return "reserva-detalle";
+    }
+}

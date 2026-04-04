@@ -25,10 +25,21 @@ public class ActividadController {
     }
 
     @GetMapping("/actividades")
-    public String listarActividades(Model model) {
-        model.addAttribute("actividades", actividadService.getActividades());
-        return "actividades";
-    }
+public String listarActividades(
+        @RequestParam(required = false) String ordenar,
+        @RequestParam(required = false) Double userLat,
+        @RequestParam(required = false) Double userLon,
+        Model model) {
+
+    var actividades = actividadService.getActividades();
+
+    actividades = actividadService.ordenarActividades(actividades, ordenar, userLat, userLon);
+
+    model.addAttribute("actividades", actividades);
+    model.addAttribute("ordenSeleccionado", ordenar);
+
+    return "actividades";
+}
 
     @GetMapping("/actividades/{id}")
     public String verDetalle(@PathVariable Long id,

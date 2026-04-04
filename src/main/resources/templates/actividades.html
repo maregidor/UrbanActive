@@ -51,6 +51,27 @@
             </div>
         </div>
 
+    <div class="row mb-4">
+    <div class="col-lg-12">
+        <form method="get" action="/actividades" class="d-flex align-items-center gap-2">
+            <label class="fw-semibold">Ordenar por:</label>
+            <select name="ordenar" onchange="this.form.submit()" class="form-select w-auto">
+                <option value="">Seleccionar</option>
+                <option value="fecha">Fecha</option>
+                <option value="precio">Precio</option>
+                <option value="valoracion">Valoración</option>
+                <option value="distancia">Distancia</option>
+            </select>
+        </form>
+
+        <p class="mt-2 text-muted" th:if="${ordenSeleccionado}">
+            Ordenando por: <strong th:text="${ordenSeleccionado}"></strong>
+        </p>
+    </div>
+</div>
+
+
+
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 pb-5">
             <div class="col" th:each="actividad : ${actividades}">
                 <div class="card h-100 shadow-sm card-activity">

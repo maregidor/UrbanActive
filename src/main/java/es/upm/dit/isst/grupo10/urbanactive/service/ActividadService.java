@@ -68,4 +68,49 @@ public class ActividadService {
 
         return actividadRepository.save(actividad);
     }
+    //Método para ordenar la lista de actividades
+public List<Actividad> ordenarActividades(List<Actividad> actividades, String criterio, Double userLat, Double userLon) {
+
+    if (criterio == null) return actividades;
+
+    switch (criterio) {
+
+        case "fecha":
+            return actividades.stream()
+                    .sorted((a1, a2) -> a1.getFecha().compareTo(a2.getFecha()))
+                    .toList();
+
+        case "precio":
+            return actividades.stream()
+                    .sorted((a1, a2) -> Double.compare(
+                            a1.getPrecio() != null ? a1.getPrecio() : Double.MAX_VALUE,
+                            a2.getPrecio() != null ? a2.getPrecio() : Double.MAX_VALUE))
+                    .toList();
+
+        case "valoracion":
+    return actividades; // temporal
+
+        case "distancia":
+            if (userLat == null || userLon == null) return actividades;
+
+            return actividades.stream()
+                    .sorted((a1, a2) -> Double.compare(
+                            calcularDistancia(userLat, userLon, a1),
+                            calcularDistancia(userLat, userLon, a2)))
+                    .toList();
+
+        default:
+            return actividades;
+    }
 }
+
+private double calcularDistancia(Double userLat, Double userLon, Actividad a) {
+    if (a.getLatitud() == null || a.getLongitud() == null) return Double.MAX_VALUE;
+
+    double dx = userLat - a.getLatitud();
+    double dy = userLon - a.getLongitud();
+
+    return Math.sqrt(dx * dx + dy * dy);
+}
+}
+

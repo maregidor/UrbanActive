@@ -58,6 +58,8 @@ public class Actividad {
 
     private int plazasTotales;
     private int plazasDisponibles;
+    private Double latitud;
+    private Double longitud;
 
     public Actividad() {}
 
@@ -125,6 +127,14 @@ public class Actividad {
 
     public int getPlazasTotales() {
         return plazasTotales;
+    }
+
+    public Double getLatitud() { 
+        return latitud; 
+    }
+
+    public Double getLongitud() {
+         return longitud;
     }
 
     public void setPlazasTotales(int plazasTotales) {
@@ -199,5 +209,11 @@ public class Actividad {
         this.participantes = participantes;
     }
 
+    public void setLatitud(Double latitud) { 
+        this.latitud = latitud; 
+    }
     
+    public void setLongitud(Double longitud) { 
+        this.longitud = longitud;
+    }
 }

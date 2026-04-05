@@ -4,32 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explorar Actividades | UrbanActive</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .card-activity { 
-            transition: all 0.3s ease; 
-            border: 1px solid #eee; 
-            border-radius: 20px; 
-            overflow: hidden; 
+
+        .card-activity {
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            overflow: hidden;
             background: white;
         }
-        .card-activity:hover { 
-            transform: translateY(-8px); 
+
+        .card-activity:hover {
+            transform: translateY(-8px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             border-color: #0d6efd;
         }
-        .img-container { height: 210px; object-fit: cover; }
-        .top-nav { background: white; border-bottom: 1px solid #f0f0f0; }
-        .info-line { font-size: 0.9rem; color: #666; display: flex; align-items: center; margin-bottom: 0.5rem; }
-        /* El icono de la info-line por defecto ya es azul corporativo (#0d6efd) */
-        .info-line i { width: 20px; color: #0d6efd; margin-right: 8px; }
-        .price-tag { font-size: 1.1rem; font-weight: 700; color: #198754; }
+
+        .img-container {
+            height: 210px;
+            object-fit: cover;
+        }
+
+        .top-nav {
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-line {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-line i {
+            width: 20px;
+            color: #0d6efd;
+            margin-right: 8px;
+        }
+
+        .price-tag {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #198754;
+        }
+
+        .map-section {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #eee;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+        }
+
+        .map-header {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        }
+
+        .map-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .search-box-wrapper {
+            padding: 0 1.5rem 1rem 1.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 999px;
+            padding: 0.85rem 1rem;
+        }
+
+        .search-box i {
+            color: #6c757d;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 430px;
+        }
+
+        .popup-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .popup-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .popup-link {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .map-count {
+            font-size: 0.95rem;
+            color: #666;
+            padding: 0 1.5rem 1rem 1.5rem;
+        }
     </style>
 </head>
+
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
@@ -51,43 +150,78 @@
             </div>
         </div>
 
-    <div class="row mb-4">
-    <div class="col-lg-12">
-        <form method="get" action="/actividades" class="d-flex align-items-center gap-2">
-            <label class="fw-semibold">Ordenar por:</label>
-            <select name="ordenar" onchange="this.form.submit()" class="form-select w-auto">
-                <option value="">Seleccionar</option>
-                <option value="fecha">Fecha</option>
-                <option value="precio">Precio</option>
-                <option value="valoracion">Valoración</option>
-                <option value="distancia">Distancia</option>
-            </select>
-        </form>
+        <!-- MAPA + BUSCADOR -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <section class="map-section">
+                    <div class="map-header">
+                        <div class="small text-muted mb-1">Explora</div>
+                        <h2 class="map-title mb-0">Actividades en el mapa</h2>
+                    </div>
 
-        <p class="mt-2 text-muted" th:if="${ordenSeleccionado}">
-            Ordenando por: <strong th:text="${ordenSeleccionado}"></strong>
-        </p>
-    </div>
-</div>
+                    <div class="search-box-wrapper">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Buscar actividades...">
+                        </div>
+                    </div>
 
+                    <div class="map-count">
+                        <span id="activityCount"
+                              th:text="${#lists.size(actividades)} + ' actividades disponibles'">
+                            0 actividades disponibles
+                        </span>
+                    </div>
 
+                    <div id="map"></div>
+                </section>
+            </div>
+        </div>
 
+        <!-- FILTRO DE ORDENAR: SE MANTIENE -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <form method="get" action="/actividades" class="d-flex align-items-center gap-2">
+                    <label class="fw-semibold">Ordenar por:</label>
+                    <select name="ordenar" onchange="this.form.submit()" class="form-select w-auto">
+                        <option value="">Seleccionar</option>
+                        <option value="fecha">Fecha</option>
+                        <option value="precio">Precio</option>
+                        <option value="valoracion">Valoración</option>
+                        <option value="distancia">Distancia</option>
+                    </select>
+                </form>
+
+                <p class="mt-2 text-muted" th:if="${ordenSeleccionado}">
+                    Ordenando por: <strong th:text="${ordenSeleccionado}"></strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- LISTADO DE TARJETAS: SE MANTIENE -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 pb-5">
             <div class="col" th:each="actividad : ${actividades}">
-                <div class="card h-100 shadow-sm card-activity">
+                <div class="card h-100 shadow-sm card-activity activity-card"
+                     th:attr="data-id=${actividad.id},
+                              data-title=${actividad.titulo},
+                              data-description=${actividad.descripcion},
+                              data-type=${actividad.tipo},
+                              data-location=${actividad.espacioPublico != null ? actividad.espacioPublico.nombre : 'Ubicación pendiente'},
+                              data-lat=${actividad.latitud},
+                              data-lon=${actividad.longitud}">
                     <div class="position-relative">
                         <img th:src="${actividad.imagen}" class="card-img-top img-container" alt="Imagen actividad"
                              onerror="this.src='https://via.placeholder.com/400x200?text=UrbanActive'">
-                        <span class="position-absolute top-0 end-0 m-3 badge rounded-pill bg-white text-dark shadow-sm px-3 py-2" 
+                        <span class="position-absolute top-0 end-0 m-3 badge rounded-pill bg-white text-dark shadow-sm px-3 py-2"
                               th:text="${actividad.tipo}">Tipo</span>
                     </div>
-                    
+
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="card-title fw-bold mb-0 text-truncate" th:text="${actividad.titulo}">Título</h5>
                             <span class="price-tag" th:text="${actividad.precio > 0 ? actividad.precio + '€' : 'Gratis'}">0€</span>
                         </div>
-                        
+
                         <div class="info-line">
                             <i class="fas fa-building"></i>
                             <span th:text="${actividad.nombreOrganizador}">Organizador</span>
@@ -104,7 +238,7 @@
                         </div>
 
                         <div class="info-line" th:if="${actividad.organizacion != null and actividad.organizacion.valoracion != null}">
-                            <i class="fas fa-star text-primary"></i> 
+                            <i class="fas fa-star text-primary"></i>
                             <span class="fw-semibold text-muted" th:text="${actividad.organizacion.valoracion.estrellas}">⭐⭐⭐⭐</span>
                             <span class="ms-1 text-muted small" th:text="'(' + ${actividad.organizacion.valoracion.puntuacion} + ')'">4.5</span>
                         </div>
@@ -125,6 +259,98 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const map = L.map('map').setView([40.4168, -3.7038], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            const cards = Array.from(document.querySelectorAll('.activity-card'));
+            const searchInput = document.getElementById('searchInput');
+            const activityCount = document.getElementById('activityCount');
+
+            const markerMap = new Map();
+            const bounds = [];
+
+            cards.forEach(card => {
+                const lat = parseFloat(card.dataset.lat);
+                const lon = parseFloat(card.dataset.lon);
+                const title = card.dataset.title;
+                const type = card.dataset.type;
+                const location = card.dataset.location;
+                const id = card.dataset.id;
+                const link = card.querySelector('a.btn')?.getAttribute('href');
+
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    const marker = L.marker([lat, lon]).addTo(map);
+
+                    marker.bindPopup(`
+                        <div class="popup-title">${title}</div>
+                        <div class="popup-meta">${type} · ${location}</div>
+                        <a class="popup-link" href="${link}">Ver actividad</a>
+                    `);
+
+                    markerMap.set(id, marker);
+                    bounds.push([lat, lon]);
+
+                    card.addEventListener('mouseenter', function () {
+                        marker.openPopup();
+                    });
+                }
+            });
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [40, 40] });
+            }
+
+            function normalize(text) {
+                return (text || '').toLowerCase();
+            }
+
+            function filterActivities() {
+                const query = normalize(searchInput.value);
+                let visibles = 0;
+                const visibleBounds = [];
+
+                cards.forEach(card => {
+                    const text =
+                        normalize(card.dataset.title) + ' ' +
+                        normalize(card.dataset.description) + ' ' +
+                        normalize(card.dataset.type) + ' ' +
+                        normalize(card.dataset.location);
+
+                    const visible = text.includes(query);
+
+                    card.parentElement.style.display = visible ? '' : 'none';
+
+                    const marker = markerMap.get(card.dataset.id);
+                    if (marker) {
+                        if (visible) {
+                            marker.addTo(map);
+                            visibleBounds.push(marker.getLatLng());
+                        } else {
+                            map.removeLayer(marker);
+                        }
+                    }
+
+                    if (visible) visibles++;
+                });
+
+                activityCount.textContent = visibles + ' actividades disponibles';
+
+                if (visibleBounds.length > 0) {
+                    map.fitBounds(visibleBounds, { padding: [40, 40] });
+                }
+            }
+
+            searchInput.addEventListener('input', filterActivities);
+        });
+    </script>
+
 </body>
 </html>

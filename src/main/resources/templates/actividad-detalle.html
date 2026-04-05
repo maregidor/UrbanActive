@@ -143,11 +143,18 @@
           <div th:text="${actividad.precio} + ' €'"></div>
         </div>
       <!-- BOTÓN -->
-      <form th:action="@{/actividades/{id}/reservar(id=${actividad.id})}" method="post">
-            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow" 
-                    th:disabled="${actividad.plazasDisponibles <= 0}">
-              <span th:text="${actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles'}">Reservar</span>
-            </button>
+      <form th:action="@{/reservas/procesar}" method="post">
+        <input type="hidden" name="actividadId" th:value="${actividad.id}">
+
+        <button type="submit"
+        class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow"
+        th:disabled="${yaReservada or actividad.plazasDisponibles <= 0}">
+
+        <span th:text="${yaReservada ? 'Ya reservada' : (actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles')}">
+                      Reservar plaza ahora
+        </span>
+        </button>
+      </form>
              <p class="text-center small text-muted mt-3">Al reservar, aceptas nuestras normas de uso urbano.</p>
     </aside>
 

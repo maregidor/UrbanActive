@@ -3,6 +3,7 @@ package es.upm.dit.isst.grupo10.urbanactive.config;
 import es.upm.dit.isst.grupo10.urbanactive.model.*;
 import es.upm.dit.isst.grupo10.urbanactive.repository.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -15,15 +16,18 @@ public class DataInitializer implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final OrganizacionRepository organizacionRepository;
     private final EspacioPublicoRepository espacioRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public DataInitializer(ActividadRepository actividadRepository, 
                            UsuarioRepository usuarioRepository, 
                            OrganizacionRepository organizacionRepository,
-                           EspacioPublicoRepository espacioRepository) {
+                           EspacioPublicoRepository espacioRepository,
+                           BCryptPasswordEncoder passwordEncoder) {
         this.actividadRepository = actividadRepository;
         this.usuarioRepository = usuarioRepository;
         this.organizacionRepository = organizacionRepository;
         this.espacioRepository = espacioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class DataInitializer implements CommandLineRunner {
             new Identificacion("CIF", "B11223344"), "Urban Yoga Studio", new Valoracion(2.2, 50)));
 
         // 3. USUARIO (Participante)
-        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0)));
+        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0), passwordEncoder.encode("1234")));
 
         // 4. SEIS ACTIVIDADES DISTINTAS
 

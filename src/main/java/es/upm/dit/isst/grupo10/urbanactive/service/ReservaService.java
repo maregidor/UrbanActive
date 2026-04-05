@@ -63,7 +63,7 @@ public class ReservaService {
         }
     }
 
-    private boolean yaTieneReservaActiva(Usuario usuario, Long actividadId) {
+    public boolean yaTieneReservaActiva(Usuario usuario, Long actividadId) {
         List<Reserva> reservasExistentes = reservaRepository.findByUsuarioAndActividadId(usuario, actividadId);
         return reservasExistentes.stream()
                 .anyMatch(r -> r.estaActiva());

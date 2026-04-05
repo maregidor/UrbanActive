@@ -3,11 +3,16 @@ package es.upm.dit.isst.grupo10.urbanactive.controller;
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Reserva;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
+import es.upm.dit.isst.grupo10.urbanactive.model.Email;
 import es.upm.dit.isst.grupo10.urbanactive.service.ReservaService;
 import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
+import es.upm.dit.isst.grupo10.urbanactive.repository.UsuarioRepository;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -21,10 +26,22 @@ public class ReservaController {
 
     private final ReservaService reservaService;
     private final ActividadRepository actividadRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public ReservaController(ReservaService reservaService, ActividadRepository actividadRepository) {
+    public ReservaController(ReservaService reservaService, ActividadRepository actividadRepository, UsuarioRepository usuarioRepository) {
         this.reservaService = reservaService;
         this.actividadRepository = actividadRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    private Usuario getUsuarioAutenticado(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getName() == null || auth.getName().equals("anoymousUser")){
+            return null;
+        }
+
+        return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
     }
 
     @GetMapping("/")
@@ -53,7 +70,7 @@ public class ReservaController {
         }
 
         // Obtener usuario logueado de la sesión
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) getUsuarioAutenticado();
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -69,11 +86,16 @@ public class ReservaController {
                                 RedirectAttributes redirectAttributes) {
         
         // Obtener usuario logueado de la sesión
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) getUsuarioAutenticado();
         if (usuario == null) {
             return "redirect:/login";
         }
         
+        if (reservaService.yaTieneReservaActiva(usuario, actividadId)) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Ya tienes esta actividad reservada.");
+            return "redirect:/actividades/" + actividadId;
+        }
+
         boolean exito = reservaService.reservarPlaza(usuario, actividadId);
 
         if (exito) {
@@ -83,6 +105,7 @@ public class ReservaController {
             redirectAttributes.addFlashAttribute("mensajeError", "No se pudo realizar la reserva. Verifica que haya plazas disponibles.");
             return "redirect:/reservas/formulario/" + actividadId;
         }
+
     }
 
     @GetMapping("/exito")
@@ -109,7 +132,7 @@ public class ReservaController {
 
     @GetMapping("/mis-reservas")
     public String mostrarMisReservas(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) getUsuarioAutenticado();
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -125,7 +148,7 @@ public class ReservaController {
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes) {
         
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) getUsuarioAutenticado();
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -145,7 +168,7 @@ public class ReservaController {
     public String verDetalleReserva(@PathVariable Long reservaId, 
                                    HttpSession session,
                                    Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) getUsuarioAutenticado();
         if (usuario == null) {
             return "redirect:/login";
         }

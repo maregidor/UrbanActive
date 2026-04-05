@@ -30,12 +30,13 @@ public class AuthController {
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email,
                              @RequestParam String nombre,
+                             @RequestParam String password,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         try {
             // Crear usuario con los datos del formulario
             Email emailObj = new Email(email);
-            Usuario usuario = new Usuario(emailObj, nombre, new Nivel(5.0));
+            Usuario usuario = new Usuario(emailObj, nombre, new Nivel(5.0), password);
             
             // Guardar usuario en la base de datos si no existe
             if (!usuarioRepository.existsById(emailObj)) {

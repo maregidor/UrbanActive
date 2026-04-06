@@ -37,7 +37,7 @@ public class ReservaController {
     private Usuario getUsuarioAutenticado(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || auth.getName() == null || auth.getName().equals("anoymousUser")){
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")){
             return null;
         }
 

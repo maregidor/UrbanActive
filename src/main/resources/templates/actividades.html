@@ -126,7 +126,7 @@
 
                         <div class="info-line mb-4">
                             <i class="fas fa-users"></i>
-                            <span class="fw-semibold" th:text="${actividad.plazasDisponibles} + '/' + ${actividad.plazasTotales} + ' plazas'">0/0 plazas</span>
+                            <span class="fw-semibold" th:text="${actividad.plazasDisponibles} + ' plazas libres'">0 plazas libres</span>
                         </div>
 
                         <a th:href="@{/actividades/{id}(id=${actividad.id})}" class="btn btn-primary w-100 rounded-pill fw-semibold">

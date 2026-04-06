@@ -114,6 +114,11 @@ body {
   font-weight: bold;
 }
 
+.metric-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
 /* BOTON */
 .reserve-btn {
   width: 100%;
@@ -124,3 +129,25 @@ body {
   border: none;
   border-radius: 10px;
 }
+
+
+.price-box {
+  background: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  text-align: left;
+}
+
+.price-box .price-label {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.price-value {
+  font-size: 18px;
+  color: #111827;
+}
+

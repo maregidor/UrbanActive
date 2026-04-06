@@ -13,6 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import es.upm.dit.isst.grupo10.urbanactive.dto.ActividadContexto;
+import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
+import es.upm.dit.isst.grupo10.urbanactive.service.ActividadContextService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 @Controller
 public class ActividadController {
 
@@ -20,12 +25,16 @@ private final ActividadService actividadService;
 private final ReservaService reservaService;
 private final UsuarioRepository usuarioRepository;
 
+private final ActividadContextService actividadContextService;
+
 public ActividadController(ActividadService actividadService,
-ReservaService reservaService,
-UsuarioRepository usuarioRepository) {
-this.actividadService = actividadService;
-this.reservaService = reservaService;
-this.usuarioRepository = usuarioRepository;
+                           ReservaService reservaService,
+                           UsuarioRepository usuarioRepository,
+                           ActividadContextService actividadContextService) {
+    this.actividadService = actividadService;
+    this.reservaService = reservaService;
+    this.usuarioRepository = usuarioRepository;
+    this.actividadContextService = actividadContextService;
 }
 
 @GetMapping("/actividades")
@@ -35,23 +44,34 @@ return "actividades";
 }
 
 @GetMapping("/actividades/{id}")
-public String verDetalle(@PathVariable Long id, Model model) {
-Actividad actividad = actividadService.getActividadById(id);
-if (actividad == null) {
-return "redirect:/actividades";
-}
+public String verDetalle(@PathVariable Long id,
+                         @RequestParam(required = false) Double userLat,
+                         @RequestParam(required = false) Double userLon,
+                         Model model) {
+    Actividad actividad = actividadService.getActividadById(id);
+    if (actividad == null) {
+        return "redirect:/actividades";
+    }
 
-Usuario usuario = getUsuarioAutenticado();
+    Usuario usuario = getUsuarioAutenticado();
 
-boolean yaReservada = false;
-if (usuario != null) {
-yaReservada = reservaService.yaTieneReservaActiva(usuario, id);
-}
+    boolean yaReservada = false;
+    if (usuario != null) {
+        yaReservada = reservaService.yaTieneReservaActiva(usuario, id);
+    }
 
-model.addAttribute("actividad", actividad);
-model.addAttribute("yaReservada", yaReservada);
+    GeoPoint userPoint = null;
+    if (userLat != null && userLon != null) {
+        userPoint = new GeoPoint(userLat, userLon, "Mi ubicación");
+    }
 
-return "actividad-detalle";
+    ActividadContexto contexto = actividadContextService.getContexto(actividad, userPoint);
+
+    model.addAttribute("actividad", actividad);
+    model.addAttribute("yaReservada", yaReservada);
+    model.addAttribute("contexto", contexto);
+
+    return "actividad-detalle";
 }
 
 private Usuario getUsuarioAutenticado() {

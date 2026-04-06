@@ -121,41 +121,47 @@
         <div class="card-metric traffic-card">
           <div class="fw-semibold mb-2">Trayecto</div>
 
-          <div th:if="${contexto != null and contexto.traffic() != null}">
-
+          <div th:if="${contexto != null and contexto.traffic != null}">
             <div class="traffic-level"
-                 th:classappend="${contexto.traffic().nivel() == 'Bajo' ? 'traffic-low' :
-                                (contexto.traffic().nivel() == 'Medio' ? 'traffic-medium' : 'traffic-high')}"
-                 th:text="${contexto.traffic().nivel()}">
+                 th:classappend="${contexto.traffic.nivel == 'Bajo' ? 'traffic-low' :
+                                (contexto.traffic.nivel == 'Medio' ? 'traffic-medium' : 'traffic-high')}"
+                 th:text="${contexto.traffic.nivel}">
             </div>
 
             <div class="small mb-1"
-                 th:text="${contexto.traffic().resumen()}">
+                 th:text="${contexto.traffic.resumen}">
             </div>
+          </div>
 
+          <div th:if="${contexto == null or contexto.traffic == null}" class="text-muted small">
+            No hay datos de trayecto
           </div>
         </div>
 
-        
       </div>
+
       <div class="text-end">
-          <div class="fw-semibold">Precio</div>
-          <div th:text="${actividad.precio} + ' €'"></div>
-        </div>
+        <div class="fw-semibold">Precio</div>
+        <div th:text="${actividad.precio} + ' €'"></div>
+      </div>
+
       <!-- BOTÓN -->
       <form th:action="@{/reservas/procesar}" method="post">
         <input type="hidden" name="actividadId" th:value="${actividad.id}">
 
         <button type="submit"
-        class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow"
-        th:disabled="${yaReservada or actividad.plazasDisponibles <= 0}">
+                class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow"
+                th:disabled="${yaReservada or actividad.plazasDisponibles <= 0}">
 
-        <span th:text="${yaReservada ? 'Ya reservada' : (actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles')}">
-                      Reservar plaza ahora
-        </span>
+          <span th:text="${yaReservada ? 'Ya reservada' : (actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles')}">
+            Reservar plaza ahora
+          </span>
         </button>
       </form>
-             <p class="text-center small text-muted mt-3">Al reservar, aceptas nuestras normas de uso urbano.</p>
+
+      <p class="text-center small text-muted mt-3">
+        Al reservar, aceptas nuestras normas de uso urbano.
+      </p>
     </aside>
 
   </div>

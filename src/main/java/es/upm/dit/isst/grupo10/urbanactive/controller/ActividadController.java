@@ -51,8 +51,15 @@ public String listarActividades(
         
     model.addAttribute("actividades", actividades);
     model.addAttribute("ordenActual", orden); // Para saber qué botón marcar como activo en el HTML
+    model.addAttribute("esOrganizador", true);
         
     return "actividades";
+}
+
+@GetMapping("/actividades/crear")
+public String mostrarFormularioCrearActividad(Model model) {
+    model.addAttribute("actividad", new Actividad());
+    return "crear-actividad";
 }
 
 @GetMapping("/actividades/{id}")

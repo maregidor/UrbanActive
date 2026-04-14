@@ -39,8 +39,16 @@ public ActividadController(ActividadService actividadService,
 
 @GetMapping("/actividades")
 public String listarActividades(Model model) {
-model.addAttribute("actividades", actividadService.getActividades());
-return "actividades";
+
+    model.addAttribute("actividades", actividadService.getActividades());
+    model.addAttribute("esOrganizador", true);
+    return "actividades";
+}
+
+@GetMapping("/actividades/crear")
+public String mostrarFormularioCrearActividad(Model model) {
+    model.addAttribute("actividad", new Actividad());
+    return "crear-actividad";
 }
 
 @GetMapping("/actividades/{id}")

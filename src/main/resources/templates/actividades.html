@@ -62,19 +62,21 @@
 
         <div class="row mb-4">
             <div class="col-lg-12">
-                <form method="get" action="/actividades" class="d-flex align-items-center gap-2">
+                <form method="get" action="/actividades" id='sortForm' class="d-flex align-items-center gap-2">
                     <label class="fw-semibold">Ordenar por:</label>
-                    <select name="ordenar" onchange="this.form.submit()" class="form-select w-auto">
+                    <select name="orden" onchange="handleSortChange(this.value)" class="form-select w-auto">
                         <option value="">Seleccionar</option>
-                        <option value="fecha" th:selected="${ordenSeleccionado == 'fecha'}">Fecha</option>
-                        <option value="precio" th:selected="${ordenSeleccionado == 'precio'}">Precio</option>
-                        <option value="valoracion" th:selected="${ordenSeleccionado == 'valoracion'}">Valoración</option>
-                        <option value="distancia" th:selected="${ordenSeleccionado == 'distancia'}">Distancia</option>
+                        <option value="fecha" th:selected="${ordenActual == 'fecha'}">Fecha</option>
+                        <option value="precio" th:selected="${ordenActual == 'precio'}">Precio</option>
+                        <option value="valoracion" th:selected="${ordenActual == 'valoracion'}">Valoración</option>
+                        <option value="distancia" th:selected="${ordenActual == 'distancia'}">Distancia</option>
                     </select>
+                    <input type="hidden" name="userLat" id="userLat">
+                    <input type="hidden" name="userLon" id="userLon">
                 </form>
 
-                <p class="mt-2 text-muted" th:if="${ordenSeleccionado}">
-                    Ordenando por: <strong th:text="${ordenSeleccionado}"></strong>
+                <p class="mt-2 text-muted" th:if="${ordenActual}">
+                    Ordenando por: <strong th:text="${ordenActual}"></strong>
                 </p>
             </div>
         </div>
@@ -181,6 +183,31 @@
                 markers.push({ marker, card });
             }
         });
+
+        function handleSortChange(value) {
+            const form = document.getElementById('sortForm');
+            
+            if (value === 'distancia') {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            document.getElementById('userLat').value = position.coords.latitude;
+                            document.getElementById('userLon').value = position.coords.longitude;
+                            form.submit();
+                        },
+                        (error) => {
+                            alert("Ubicación denegada. Se usará el orden por fecha.");
+                            form.querySelector('select').value = 'fecha';
+                            form.submit();
+                        }
+                    );
+                } else {
+                    alert("Tu navegador no soporta geolocalización.");
+                }
+            } else {
+                form.submit();
+            }
+        }
 
         function filterActivities() {
             const query = searchInput.value.toLowerCase().trim();

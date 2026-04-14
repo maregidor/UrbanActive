@@ -6,8 +6,7 @@ import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Comparator;
 
 @Service
 public class ActividadService {
@@ -21,8 +20,7 @@ public class ActividadService {
     }
 
     public List<Actividad> getActividades() {
-        return StreamSupport.stream(actividadRepository.findAll().spliterator(), false)
-                            .collect(Collectors.toList());
+        return actividadRepository.findAll();
     }
 
     public Actividad getActividadById(Long id) {
@@ -41,7 +39,6 @@ public class ActividadService {
         return false;
     }
 
-    // 5. Método extra para que tú puedas guardar nuevas actividades desde tu US
     public Actividad guardarActividad(Actividad actividad) {
         if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
             try {
@@ -62,55 +59,47 @@ public class ActividadService {
                 }
 
             } catch (Exception e) {
-            System.out.println("Error geocoding: " + e.getMessage());
+                System.out.println("Error geocoding: " + e.getMessage());
             }
         }
 
         return actividadRepository.save(actividad);
     }
-    //Método para ordenar la lista de actividades
-public List<Actividad> ordenarActividades(List<Actividad> actividades, String criterio, Double userLat, Double userLon) {
+    
+    public List<Actividad> getActividadesOrdenadas(String criterio, Double userLat, Double userLon) {
+        
+        if ("precio".equalsIgnoreCase(criterio)) {
+            return actividadRepository.findAllByOrderByPrecioAsc();
+        } 
+        
+        if ("valoracion".equalsIgnoreCase(criterio)) {
+            return actividadRepository.findAllByOrderByOrganizacion_Valoracion_PuntuacionDesc();
+        }
 
-    if (criterio == null) return actividades;
-
-    switch (criterio) {
-
-        case "fecha":
-            return actividades.stream()
-                    .sorted((a1, a2) -> a1.getFecha().compareTo(a2.getFecha()))
-                    .toList();
-
-        case "precio":
-            return actividades.stream()
-                    .sorted((a1, a2) -> Double.compare(
-                            a1.getPrecio() != null ? a1.getPrecio() : Double.MAX_VALUE,
-                            a2.getPrecio() != null ? a2.getPrecio() : Double.MAX_VALUE))
-                    .toList();
-
-        case "valoracion":
-    return actividades; // temporal
-
-        case "distancia":
-            if (userLat == null || userLon == null) return actividades;
-
-            return actividades.stream()
-                    .sorted((a1, a2) -> Double.compare(
-                            calcularDistancia(userLat, userLon, a1),
-                            calcularDistancia(userLat, userLon, a2)))
-                    .toList();
-
-        default:
+        if ("distancia".equalsIgnoreCase(criterio) && userLat != null && userLon != null) {
+            List<Actividad> actividades = actividadRepository.findAll();
+            actividades.sort(Comparator.comparingDouble(a -> 
+                calcularDistancia(userLat, userLon, a.getLatitud(), a.getLongitud())
+            ));
             return actividades;
+        }
+
+        return actividadRepository.findAllByOrderByFechaAsc();
     }
-}
+    
+    private double calcularDistancia(double lat1, double lon1, double lat2, double lon2) {
+        if (lat1 == 0 || lon1 == 0 || lat2 == 0 || lon2 == 0) return Double.MAX_VALUE;
 
-private double calcularDistancia(Double userLat, Double userLon, Actividad a) {
-    if (a.getLatitud() == null || a.getLongitud() == null) return Double.MAX_VALUE;
-
-    double dx = userLat - a.getLatitud();
-    double dy = userLon - a.getLongitud();
-
-    return Math.sqrt(dx * dx + dy * dy);
-}
+        final int R = 6371; // Radio de la Tierra en km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 }
 

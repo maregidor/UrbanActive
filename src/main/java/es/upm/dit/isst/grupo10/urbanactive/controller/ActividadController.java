@@ -18,13 +18,14 @@ import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
 import es.upm.dit.isst.grupo10.urbanactive.service.ActividadContextService;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class ActividadController {
 
 private final ActividadService actividadService;
 private final ReservaService reservaService;
 private final UsuarioRepository usuarioRepository;
-
 private final ActividadContextService actividadContextService;
 
 public ActividadController(ActividadService actividadService,
@@ -38,9 +39,20 @@ public ActividadController(ActividadService actividadService,
 }
 
 @GetMapping("/actividades")
-public String listarActividades(Model model) {
-model.addAttribute("actividades", actividadService.getActividades());
-return "actividades";
+public String listarActividades(
+        @RequestParam(required = false) String orden,
+        @RequestParam(required = false) Double userLat,
+        @RequestParam(required = false) Double userLon,
+        Model model) {
+
+    System.out.println("ORDEN RECIBIDO EN CONTROLLER: [" + orden + "]");
+    
+    List<Actividad> actividades = actividadService.getActividadesOrdenadas(orden, userLat, userLon);
+        
+    model.addAttribute("actividades", actividades);
+    model.addAttribute("ordenActual", orden); // Para saber qué botón marcar como activo en el HTML
+        
+    return "actividades";
 }
 
 @GetMapping("/actividades/{id}")

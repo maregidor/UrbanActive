@@ -33,6 +33,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         
+        if (actividadRepository.count() > 0) {
+            System.out.println("Base de datos ya poblada. Saltando inicialización.");
+            return;
+        }
+
         System.out.println("Cargando datos de prueba en la BBDD...");
 
         // 1. ESPACIOS PÚBLICOS

@@ -56,7 +56,7 @@ public class DataInitializer implements CommandLineRunner {
             new Identificacion("CIF", "B11223344"), "Urban Yoga Studio", new Valoracion(2.2, 50)));
 
         // 3. USUARIO (Participante)
-        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0), passwordEncoder.encode("1234")));
+        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0), passwordEncoder.encode("1234"), null, null));
 
         // 4. SEIS ACTIVIDADES DISTINTAS
 

@@ -36,7 +36,7 @@ public class AuthController {
         try {
             // Crear usuario con los datos del formulario
             Email emailObj = new Email(email);
-            Usuario usuario = new Usuario(emailObj, nombre, new Nivel(5.0), password);
+            Usuario usuario = new Usuario(emailObj, nombre, new Nivel(5.0), password, null, null);
             
             // Guardar usuario en la base de datos si no existe
             if (!usuarioRepository.existsById(emailObj)) {

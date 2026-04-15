@@ -24,6 +24,14 @@ public class Actividad {
     @Embedded
     private Nivel nivel;
 
+    private LocalDate fecha;
+    private LocalTime hora;
+    private int plazasTotales;
+    private int plazasDisponibles;
+    private String duracion;
+    private String imagen;
+    private Double precio;
+
     @ManyToOne
     @JoinColumn(name = "usuario_organizador_id")
     private Usuario usuarioOrganizador;
@@ -35,17 +43,11 @@ public class Actividad {
     })
     private Organizacion organizacion;
 
-    private LocalDate fecha;
-    private LocalTime hora;
-    private String duracion;
-    private String imagen;
-    private Double precio;
-
     @ManyToOne
     @JoinColumn(name = "espacio_id")
     private EspacioPublico espacioPublico;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private CondicionEntorno condicionesEntorno;
 
     @ManyToMany
@@ -56,8 +58,6 @@ public class Actividad {
     )
     private List <Usuario> participantes = new ArrayList<>();
 
-    private int plazasTotales;
-    private int plazasDisponibles;
     private Double latitud;
     private Double longitud;
 

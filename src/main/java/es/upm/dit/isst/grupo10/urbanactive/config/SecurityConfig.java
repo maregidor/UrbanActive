@@ -11,25 +11,29 @@ public class SecurityConfig {
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-http
+    http
 
-.csrf(csrf -> csrf.disable())
+    .csrf(csrf -> csrf.disable())
 
-.authorizeHttpRequests(auth -> auth
-.requestMatchers("/login", "/css/**", "/js/**").permitAll()
-.requestMatchers("/reservas/**").authenticated()
-.anyRequest().permitAll()
-)
-.formLogin(form -> form
-.loginPage("/login")
-.defaultSuccessUrl("/actividades", true)
-.permitAll()
-)
-.logout(logout -> logout
-.logoutSuccessUrl("/actividades")
-);
+        .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
+        .requestMatchers("/reservas/**").authenticated()
+        .requestMatchers("/h2-console/**").permitAll()
+        .anyRequest().permitAll()
+    )
 
-return http.build();
+    .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+        .formLogin(form -> form
+        .loginPage("/login")
+        .defaultSuccessUrl("/actividades", true)
+        .permitAll()
+    )
+
+    .logout(logout -> logout
+        .logoutSuccessUrl("/actividades")
+    );
+
+    return http.build();
 }
 
 @Bean

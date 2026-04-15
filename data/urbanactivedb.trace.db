@@ -1,0 +1,4 @@
+2026-04-15 16:33:36.684931+02:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "ACTIVIDAD_PARTICIPANTE" no encontrada
+Table "ACTIVIDAD_PARTICIPANTE" not found; SQL statement:
+SELECT * FROM ACTIVIDAD_PARTICIPANTE [42102-232]

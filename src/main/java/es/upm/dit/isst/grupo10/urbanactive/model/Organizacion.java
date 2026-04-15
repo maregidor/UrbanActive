@@ -1,8 +1,6 @@
 package es.upm.dit.isst.grupo10.urbanactive.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table (name = "organizaciones")

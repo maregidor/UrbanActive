@@ -50,13 +50,13 @@ public class Actividad {
     @ManyToOne(cascade = CascadeType.ALL)
     private CondicionEntorno condicionesEntorno;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
-        name = "actividad_participantes",
-        joinColumns = @JoinColumn(name = "actividad_id"),
-        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+        name="actividad_reservas",
+        joinColumns = @JoinColumn(name="actividad_id"),
+        inverseJoinColumns = @JoinColumn(name="reserva_id")
     )
-    private List <Usuario> participantes = new ArrayList<>();
+    private List <Reserva> reservas = new ArrayList<>();
 
     private Double latitud;
     private Double longitud;
@@ -121,7 +121,17 @@ public class Actividad {
         return condicionesEntorno;
     }
 
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
     public List<Usuario> getParticipantes() {
+        List<Usuario> participantes = new ArrayList<>();
+        for (Reserva reserva : reservas) {
+            if (reserva.estaActiva()) {
+                participantes.add(reserva.getUsuario());
+            }
+        }
         return participantes;
     }
 
@@ -205,8 +215,8 @@ public class Actividad {
         this.condicionesEntorno = condicionesEntorno;
     }
 
-    public void setParticipantes(List<Usuario> participantes) {
-        this.participantes = participantes;
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 
     public void setLatitud(Double latitud) { 

@@ -35,6 +35,14 @@ public class Usuario {
         @Column(nullable = false)
         private String password;
 
+        @OneToMany
+        @JoinTable(
+                name = "usuario_reservas",
+                joinColumns = @JoinColumn(name = "usuario_email"),
+                inverseJoinColumns = @JoinColumn(name = "reserva_id")
+        )
+        private List<Reserva> reservas = new ArrayList<>();
+
         public Usuario() {
         }
 

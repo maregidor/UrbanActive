@@ -1,31 +1,35 @@
 package es.upm.dit.isst.grupo10.urbanactive.controller;
+
+import es.upm.dit.isst.grupo10.urbanactive.model.Identificacion;
+import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
+import es.upm.dit.isst.grupo10.urbanactive.repository.OrganizacionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-
 
 @Controller
 public class PerfilController {
 
-    @GetMapping("/usuarios/{id}")
-    public String verPerfilUsuario(@PathVariable Long id, Model model) {
-        return "perfil-usuario";
-    }
+private final OrganizacionRepository organizacionRepository;
 
-    @GetMapping("/organizaciones/{id}")
-    public String verPerfilOrganizacion(@PathVariable Long id, Model model) {
-        return "perfil-organizacion";
-    }
+public PerfilController(OrganizacionRepository organizacionRepository) {
+this.organizacionRepository = organizacionRepository;
+}
 
-    @PostMapping("/usuarios/{id}/seguir")
-    public String seguirUsuario(@PathVariable Long id) {
-        return "redirect:/usuarios/" + id;
-    }
+@GetMapping("/organizaciones/{tipo}/{numero}")
+public String verPerfilOrganizacion(@PathVariable String tipo,
+@PathVariable String numero,
+Model model) {
 
-    @PostMapping("/organizaciones/{id}/seguir")
-    public String seguirOrganizacion(@PathVariable Long id) {
-        return "redirect:/organizaciones/" + id;
-    }
+Identificacion identificacion = new Identificacion(tipo, numero);
+Organizacion organizacion = organizacionRepository.findById(identificacion).orElse(null);
+
+if (organizacion == null) {
+return "redirect:/actividades";
+}
+
+model.addAttribute("organizacion", organizacion);
+return "perfil-organizacion";
+}
 }

@@ -17,6 +17,8 @@ public interface SeguimientoUsuarioRepository extends JpaRepository<SeguimientoU
 
     long countBySeguido(Usuario seguido);                                                            // Conteo de seguidores de un usuario
 
+    long countBySeguidor(Usuario seguidor);                                                          // Conteo de usuarios seguidos
+
     List<SeguimientoUsuario> findBySeguidor(Usuario seguidor);                                       // Listado de seguimientos realizados por un usuario
 
     List<SeguimientoUsuario> findBySeguido(Usuario seguido);                                         // Listado de seguimientos recibidos por un usuario

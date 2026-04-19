@@ -44,7 +44,31 @@
 
         <h1 class="activity-title mb-2" th:text="${actividad.tipo}">Actividad</h1>
 
-        <p class="activity-subtitle mb-4" th:text="${actividad.nombreOrganizador}">Organizador</p>
+        <p class="lead text-muted mb-4">
+        Organizado por:
+
+        <!-- SI ES ORGANIZACIÓN -->
+        <a th:if="${actividad.organizacion != null}"
+          th:href="@{/organizaciones/{tipo}/{numero}(
+              tipo=${actividad.organizacion.identificacion.tipo},
+              numero=${actividad.organizacion.identificacion.numero}
+          )}"
+      class="fw-bold text-decoration-none text-primary">
+      <span th:text="${actividad.organizacion.nombre}">Organización</span>
+      </a>
+
+        <!-- SI ES USUARIO -->
+        <a th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}"
+          th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
+          class="fw-bold text-decoration-none text-primary">
+        <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
+          </a>
+
+        <!-- SI NO HAY -->
+        <span th:if="${actividad.organizacion == null and actividad.usuarioOrganizador == null}">
+          Sin organizador
+        </span>
+        </p>
 
         <div class="info-grid mb-4">
 

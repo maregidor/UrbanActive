@@ -47,16 +47,32 @@ O
 
 </div>
 
-<!-- Botón seguir -->
-<form method="post"
+<!-- Seguimiento -->
+<div class="d-flex flex-column align-items-end gap-2">
+<div class="text-white fw-semibold">
+<span th:text="${numSeguidores}">0</span> seguidores
+</div>
+
+<form th:if="${!yaLaSigue}" method="post"
 th:action="@{/organizaciones/{tipo}/{numero}/seguir(
 tipo=${organizacion.identificacion.tipo},
 numero=${organizacion.identificacion.numero}
 )}">
-<button class="btn btn-light btn-follow fw-semibold">
-<i class="fas fa-user-plus me-1"></i> Seguir
+<button class="btn btn-light btn-follow fw-semibold" type="submit">
+Seguir
 </button>
 </form>
+
+<form th:if="${yaLaSigue}" method="post"
+th:action="@{/organizaciones/{tipo}/{numero}/dejar-seguir(
+tipo=${organizacion.identificacion.tipo},
+numero=${organizacion.identificacion.numero}
+)}">
+<button class="btn btn-outline-light btn-follow fw-semibold" type="submit">
+Dejar de seguir
+</button>
+</form>
+</div>
 
 </div>
 

@@ -21,7 +21,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .requestMatchers("/h2-console/**").permitAll()
         .anyRequest().permitAll()
     )
-
+    
     .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
         .formLogin(form -> form
         .loginPage("/login")
@@ -32,7 +32,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     .logout(logout -> logout
         .logoutSuccessUrl("/actividades")
     );
-
+    System.out.println("Configuring security: permitAll for /login, /css/**, /js/**, /h2-console/**; authenticated for /reservas/**; permitAll for others");
     return http.build();
 }
 

@@ -8,13 +8,15 @@ import java.util.List;
 @Table(name = "usuarios")
 public class Usuario {
 
-        @EmbeddedId
+        @Id
         private Email email;
 
         private String nombre;
 
         @Embedded
         private Nivel nivelExperiencia;
+
+        private String actividadInteres;
 
         @ManyToMany
         @JoinTable(
@@ -38,13 +40,14 @@ public class Usuario {
         public Usuario() {
         }
 
-        public Usuario(Email email, String nombre, Nivel nivelExperiencia, String password, List<Usuario> seguidores, List<Usuario> siguiendo) {
+        public Usuario(Email email, String nombre, Nivel nivelExperiencia, String password, List<Usuario> seguidores, List<Usuario> siguiendo, String actividadInteres) {
                 this.email = email;
                 this.nombre = nombre;
                 this.nivelExperiencia = nivelExperiencia;
                 this.password = password;
                 this.seguidores = seguidores;
                 this.siguiendo = siguiendo;
+                this.actividadInteres = actividadInteres; 
         }
 
         public Email getEmail() {
@@ -103,5 +106,15 @@ public class Usuario {
                         usuario.getSeguidores().remove(this);
                 }
         }
+        public String getActividadInteres() {
+                return actividadInteres;
+        }
+        public void setActividadInteres(String actividadInteres) {
+                this.actividadInteres = actividadInteres;
+        }
+        public void setEmail(Email email) {
+                this.email = email;
+        }
+        
 
 }

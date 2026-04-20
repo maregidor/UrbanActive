@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -47,17 +48,46 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2. TRES ORGANIZADORES (Organizaciones con sus valoraciones)
         Organizacion madridActivo = organizacionRepository.save(new Organizacion(
-            new Identificacion("CIF", "B12345678"), "Madrid Activo SL", new Valoracion(4.5, 100)));
+            new Identificacion("CIF", "B12345678"),
+            "Madrid Activo SL",
+            new Valoracion(4.5, 100),
+            new Email("madridactivo@gmail.com"),
+            passwordEncoder.encode("1234"),
+            "B12345678",
+            "Fitness"
+        ));
         
         Organizacion crossfitMad = organizacionRepository.save(new Organizacion(
-            new Identificacion("CIF", "B87654321"), "Crossfit Madrid", new Valoracion(4.9, 250)));
-            
+            new Identificacion("CIF", "B87654321"),
+            "Crossfit Madrid",
+            new Valoracion(4.9, 250),
+            new Email("crossfit@gmail.com"),
+            passwordEncoder.encode("1234"),
+            "B87654321",
+            "Crossfit"
+        ));
+
         Organizacion urbanYoga = organizacionRepository.save(new Organizacion(
-            new Identificacion("CIF", "B11223344"), "Urban Yoga Studio", new Valoracion(2.2, 50)));
+            new Identificacion("CIF", "B11223344"),
+            "Urban Yoga Studio",
+            new Valoracion(2.2, 50),
+            new Email("yoga@gmail.com"),
+            passwordEncoder.encode("1234"),
+            "B11223344",
+            "Yoga"
+        ));
 
         // 3. USUARIO (Participante)
-        Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0), passwordEncoder.encode("1234"), null, null));
-
+        Usuario juan = usuarioRepository.save(new Usuario(
+            new Email("usuario1@gmail.com"),
+            "Juan Pérez",
+            new Nivel(5.0),
+            passwordEncoder.encode("1234"),
+            new ArrayList<>(),
+            new ArrayList<>(),
+            "Running"
+        ));
+        
         // 4. SEIS ACTIVIDADES DISTINTAS
 
         // Actividad 1: Yoga al amanecer (Barata, Alta valoración, Retiro)

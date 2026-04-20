@@ -33,14 +33,11 @@ public class Actividad {
     private Double precio;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_organizador_id")
+    @JoinColumn(name = "usuario_email")
     private Usuario usuarioOrganizador;
 
     @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "org_tipo", referencedColumnName = "tipo"),
-        @JoinColumn(name = "org_numero", referencedColumnName = "numero")
-    })
+    @JoinColumn(name = "organizacion_email")
     private Organizacion organizacion;
 
     @ManyToOne

@@ -2,21 +2,31 @@ package es.upm.dit.isst.grupo10.urbanactive.service;
 
 import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
+import es.upm.dit.isst.grupo10.urbanactive.model.Email;
+import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
+import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
 import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
+import es.upm.dit.isst.grupo10.urbanactive.repository.OrganizacionRepository;
+import es.upm.dit.isst.grupo10.urbanactive.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 public class ActividadService {
 
     private final ActividadRepository actividadRepository;
     private final GeocodingService geocodingService;
+    private final UsuarioRepository usuarioRepository;
+    private final OrganizacionRepository organizacionRepository;
 
-    public ActividadService(ActividadRepository actividadRepository, GeocodingService geocodingService) {
+    public ActividadService(ActividadRepository actividadRepository, GeocodingService geocodingService, UsuarioRepository usuarioRepository, OrganizacionRepository organizacionRepository) {
         this.actividadRepository = actividadRepository;
         this.geocodingService = geocodingService;
+        this.usuarioRepository = usuarioRepository;
+        this.organizacionRepository = organizacionRepository;
     }
 
     public List<Actividad> getActividades() {
@@ -66,6 +76,28 @@ public class ActividadService {
         return actividadRepository.save(actividad);
     }
     
+    public void crearNuevaActividad(Actividad actividad, String idPrincipal) {
+        Optional<Organizacion> org = organizacionRepository.findByIdentificacionNumero(idPrincipal);
+    
+        if (org.isPresent()) {
+            actividad.setOrganizacion(org.get());
+            actividad.setUsuarioOrganizador(null);
+        } else {
+            Usuario usuario = usuarioRepository.findById(new Email(idPrincipal)).orElse(null);
+            actividad.setUsuarioOrganizador(usuario);
+            actividad.setOrganizacion(null);
+            actividad.setPrecio(0.0); // Forzamos gratis para usuarios normales
+        }
+
+        if (actividad.getEspacioPublico() != null) {
+            actividad.setLatitud(actividad.getEspacioPublico().getLatitud());
+            actividad.setLongitud(actividad.getEspacioPublico().getLongitud());
+        }
+
+        actividad.setPlazasDisponibles(actividad.getPlazasTotales());
+        actividadRepository.save(actividad);
+    }
+
     public List<Actividad> getActividadesOrdenadas(String criterio, Double userLat, Double userLon) {
         
         if ("precio".equalsIgnoreCase(criterio)) {

@@ -41,9 +41,29 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("Cargando datos de prueba en la BBDD...");
 
         // 1. ESPACIOS PÚBLICOS
-        EspacioPublico retiro = espacioRepository.save(new EspacioPublico("Parque del Retiro", "Parque", "Madrid Centro"));
-        EspacioPublico canal = espacioRepository.save(new EspacioPublico("Instalaciones Canal", "Polideportivo", "Chamberí"));
-        EspacioPublico madridRio = espacioRepository.save(new EspacioPublico("Madrid Río", "Parque", "Arganzuela"));
+        EspacioPublico retiro = espacioRepository.save(new EspacioPublico(
+            "Parque del Retiro", 
+            "Parque", 
+            "Madrid Centro", 
+            40.4153, 
+            -3.6844
+        ));
+
+        EspacioPublico canal = espacioRepository.save(new EspacioPublico(
+            "Instalaciones Canal", 
+            "Polideportivo", 
+            "Chamberí", 
+            40.4385, 
+            -3.7071
+        ));
+
+        EspacioPublico madridRio = espacioRepository.save(new EspacioPublico(
+            "Madrid Río", 
+            "Parque",    
+            "Arganzuela", 
+            40.3980, 
+            -3.7032
+        ));
 
         // 2. TRES ORGANIZADORES (Organizaciones con sus valoraciones)
         Organizacion madridActivo = organizacionRepository.save(new Organizacion(

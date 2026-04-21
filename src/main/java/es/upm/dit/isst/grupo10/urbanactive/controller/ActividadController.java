@@ -2,8 +2,12 @@ package es.upm.dit.isst.grupo10.urbanactive.controller;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
+import es.upm.dit.isst.grupo10.urbanactive.model.Identificacion;
+import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
 import es.upm.dit.isst.grupo10.urbanactive.repository.UsuarioRepository;
+import es.upm.dit.isst.grupo10.urbanactive.repository.EspacioPublicoRepository;
+import es.upm.dit.isst.grupo10.urbanactive.repository.OrganizacionRepository;
 import es.upm.dit.isst.grupo10.urbanactive.service.ActividadService;
 import es.upm.dit.isst.grupo10.urbanactive.service.ReservaService;
 import org.springframework.security.core.Authentication;
@@ -11,7 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import es.upm.dit.isst.grupo10.urbanactive.dto.ActividadContexto;
 import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
@@ -19,6 +25,7 @@ import es.upm.dit.isst.grupo10.urbanactive.service.ActividadContextService;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ActividadController {
@@ -27,15 +34,21 @@ private final ActividadService actividadService;
 private final ReservaService reservaService;
 private final UsuarioRepository usuarioRepository;
 private final ActividadContextService actividadContextService;
+private final EspacioPublicoRepository espacioPublicoRepository;
+private final OrganizacionRepository organizacionRepository;
 
 public ActividadController(ActividadService actividadService,
                            ReservaService reservaService,
                            UsuarioRepository usuarioRepository,
-                           ActividadContextService actividadContextService) {
+                           ActividadContextService actividadContextService,
+                           EspacioPublicoRepository espacioPublicoRepository,
+                           OrganizacionRepository organizacionRepository) {
     this.actividadService = actividadService;
     this.reservaService = reservaService;
     this.usuarioRepository = usuarioRepository;
     this.actividadContextService = actividadContextService;
+    this.espacioPublicoRepository = espacioPublicoRepository;
+    this.organizacionRepository = organizacionRepository;
 }
 
 @GetMapping("/actividades")
@@ -93,13 +106,37 @@ public String verDetalle(@PathVariable Long id,
     return "actividad-detalle";
 }
 
-private Usuario getUsuarioAutenticado() {
-Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+@GetMapping("/actividades/nueva")
+public String mostrarFormularioCrear(Model model) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String username = auth.getName();
+    Optional<Organizacion> org = organizacionRepository.findByIdentificacionNumero(username);
+    boolean esOrganizador = org.isPresent();
 
-if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
-return null;
+    model.addAttribute("actividad", new Actividad());
+    model.addAttribute("espacios", espacioPublicoRepository.findAll());
+    model.addAttribute("esOrganizador", esOrganizador);
+    
+    return "crear-actividad";
 }
 
-return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
-}
+@PostMapping("/actividades/guardar")
+    public String guardarActividad(@ModelAttribute("actividad") Actividad actividad) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String idPrincipal = auth.getName(); 
+    
+        actividadService.crearNuevaActividad(actividad, idPrincipal);
+    
+        return "redirect:/actividades";
+    }
+
+    private Usuario getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+            return null;
+        }
+
+        return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
+    }
 }

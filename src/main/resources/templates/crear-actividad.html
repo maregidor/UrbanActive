@@ -2,63 +2,227 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear actividad | UrbanActive</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" th:href="@{/css/actividades.css}">
+    <style>
+        #map { height: 300px; width: 100%; z-index: 1; }
+        .search-select-container { max-height: 200px; overflow-y: auto; }
+    </style>
 </head>
 
 <body class="bg-light">
-<nav class="top-nav">
-    <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-3">
-        <div class="fw-bold fs-2">UrbanActive</div>
 
-        <div class="d-flex align-items-center gap-4">
-            <a href="/actividades" class="nav-link menu-link">Volver</a>
+    <nav class="top-nav shadow-sm bg-white mb-4">
+        <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-3">
+            <div class="fw-bold fs-2 text-primary">UrbanActive</div>
+            <div class="d-flex align-items-center gap-4">
+                <a href="/actividades" class="btn btn-outline-secondary rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                    
+                    <div class="mb-4">
+                        <h1 class="fw-bold h2">Crear nueva actividad</h1>
+                        <p class="text-muted">Completa los detalles para publicar tu sesión deportiva.</p>
+                    </div>
+
+                    <form th:action="@{/actividades/guardar}" th:object="${actividad}" method="post">
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-semibold">Título de la actividad</label>
+                                <input type="text" th:field="*{titulo}" class="form-control form-control-lg rounded-3" 
+                                       placeholder="Ej: Yoga al amanecer en el Retiro" required maxlength="40">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Categoría</label>
+                                <select th:field="*{tipo}" class="form-select rounded-3" required>
+                                    <option value="Bienestar">Bienestar</option>
+                                    <option value="Fuerza">Fuerza</option>
+                                    <option value="Cardio">Cardio</option>
+                                    <option value="Deportes de equipo">Deportes de equipo</option>
+                                    <option value="Deportes de raqueta">Deportes de raqueta</option>
+                                    <option value="Deportes de aventura">Deportes de aventura</option>
+                                    <option value="Actividades acuáticas">Actividades acuáticas</option>
+                                    <option value="Deportes de precisión">Deportes de precisión</option>
+                                    <option value="Expresión artística">Expresión artística</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Nivel</label>
+                                <select name="nivelDificultad" class="form-select rounded-3">
+                                    <option value="Principiante">Principiante</option>
+                                    <option value="Intermedio">Intermedio</option>
+                                    <option value="Avanzado">Avanzado</option>
+                                    <option value="Experto">Experto</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label class="form-label fw-semibold text-primary">Ubicación de la actividad</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-white border rounded-3 h-100">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">1. Buscar Espacio Verificado</label>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search"></i></span>
+                                                <input type="text" id="espacioSearch" class="form-control border-start-0" placeholder="Filtrar espacios...">
+                                            </div>
+                                            <select th:field="*{espacioPublico}" id="espacioSelect" class="form-select rounded-3" size="6">
+                                                <option value="" selected>-- No usar espacio verificado (Usar mapa) --</option>
+                                                <option th:each="espacio : ${espacios}" 
+                                                        th:value="${espacio.id}" 
+                                                        th:data-lat="${espacio.latitud}"
+                                                        th:data-lon="${espacio.longitud}"
+                                                        th:text="${espacio.nombre} + ' (' + ${espacio.ubicacion} + ')'">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-white border rounded-3 h-100">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">2. O marcar punto en el mapa</label>
+                                            <div id="map" class="rounded-3 border"></div>
+                                            <input type="hidden" th:field="*{latitud}" id="latitud">
+                                            <input type="hidden" th:field="*{longitud}" id="longitud">
+                                            <div id="coordsHelp" class="form-text text-primary mt-1">Haz clic para definir coordenadas personalizadas</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-semibold">Descripción detallada</label>
+                                <textarea th:field="*{descripcion}" class="form-control rounded-3" 
+                                          rows="4" placeholder="¿En qué consiste la actividad? ¿Qué deben traer?" maxlength="150"></textarea>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Fecha</label>
+                                <input type="date" th:field="*{fecha}" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Hora de inicio</label>
+                                <input type="time" th:field="*{hora}" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Duración</label>
+                                <input type="text" th:field="*{duracion}" class="form-control rounded-3" placeholder="Ej: 60 min">
+                            </div>
+
+                            <div class="col-md-6 mb-3" th:if="${esOrganizador}">
+                                <label class="form-label fw-semibold">Precio por persona</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">€</span>
+                                    <input type="number" step="0.01" th:field="*{precio}" class="form-control rounded-3" placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3" th:unless="${esOrganizador}">
+                                <label class="form-label fw-semibold">Precio</label>
+                                <input type="text" class="form-control rounded-3 bg-light" value="Gratis (Solo organizadores pueden cobrar)" readonly>
+                                <input type="hidden" th:field="*{precio}" value="0.0">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Plazas totales</label>
+                                <input type="number" th:field="*{plazasTotales}" class="form-control rounded-3" min="1" required>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold">URL de la imagen</label>
+                                <input type="url" th:field="*{imagen}" class="form-control rounded-3" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm">
+                                <i class="fas fa-plus-circle me-2"></i>Publicar Actividad
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</nav>
 
-<div class="container py-5">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script th:inline="javascript">
+        // 1. Inicializar Mapa (Madrid por defecto)
+        const map = L.map('map').setView([40.4168, -3.7038], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
 
-    <h1 class="fw-bold mb-4">Crear nueva actividad</h1>
-    <div class="card p-4 shadow-sm">
+        let marker = null;
+        const espacioSelect = document.getElementById('espacioSelect');
+        const searchInput = document.getElementById('espacioSearch');
+        const latInput = document.getElementById('latitud');
+        const lonInput = document.getElementById('longitud');
 
-        <form action="#" method="post">
+        // 2. Buscador / Filtrado del Select
+        const originalOptions = Array.from(espacioSelect.options);
+        searchInput.addEventListener('input', (e) => {
+            const filter = e.target.value.toLowerCase();
+            espacioSelect.innerHTML = '';
+            originalOptions.forEach(option => {
+                if (option.text.toLowerCase().includes(filter) || option.value === "") {
+                    espacioSelect.appendChild(option);
+                }
+            });
+        });
 
-            <div class="mb-3">
-                <label class="form-label">Título</label>
-                <input type="text" name="titulo" class="form-control" placeholder="Ej: Yoga en el parque" required>
-            </div>
+        // 3. Selección de Espacio Verificado
+        espacioSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            if (selectedOption.value !== "") {
+                const lat = selectedOption.getAttribute('data-lat');
+                const lon = selectedOption.getAttribute('data-lon');
+                
+                // Limpiar coordenadas manuales si elige un espacio verificado
+                latInput.value = '';
+                lonInput.value = '';
+                
+                if (lat && lon) {
+                    updateMarker(lat, lon, "Ubicación del espacio verificado");
+                    map.setView([lat, lon], 16);
+                }
+            }
+        });
 
-            <div class="mb-3">
-                <label class="form-label">Descripción</label>
-                <textarea name="descripcion" class="form-control" rows="3"></textarea>
-            </div>
+        // 4. Selección Manual en el Mapa
+        map.on('click', (e) => {
+            const lat = e.latlng.lat.toFixed(6);
+            const lon = e.latlng.lng.toFixed(6);
 
-            <div class="mb-3">
-                <label class="form-label">Precio (€)</label>
-                <input type="number" name="precio" class="form-control">
-            </div>
+            // Anular selección de espacio verificado si hace clic en el mapa
+            espacioSelect.value = "";
+            
+            latInput.value = lat;
+            lonInput.value = lon;
 
-            <div class="mb-3">
-                <label class="form-label">Fecha</label>
-                <input type="date" name="fecha" class="form-control">
-            </div>
+            updateMarker(lat, lon, "Ubicación personalizada fijada");
+            document.getElementById('coordsHelp').innerHTML = `<i class="fas fa-check me-1"></i> Punto fijado: ${lat}, ${lon}`;
+        });
 
-            <div class="mb-3">
-                <label class="form-label">Hora</label>
-                <input type="time" name="hora" class="form-control">
-            </div>
-
-            <button type="submit" class="btn btn-success rounded-pill px-4">
-                Crear actividad
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
+        function updateMarker(lat, lon, popupText) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map).bindPopup(popupText).openPopup();
+        }
+    </script>
 </body>
 </html>

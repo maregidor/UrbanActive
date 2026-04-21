@@ -11,14 +11,18 @@ public class EspacioPublico {
     private String nombre;
     private String tipo;
     private String ubicacion;
+    private Double latitud;
+    private Double longitud;
 
     public EspacioPublico() {
     }
 
-    public EspacioPublico(String nombre, String tipo, String ubicacion) {
+    public EspacioPublico(String nombre, String tipo, String ubicacion, Double latitud, Double longitud) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ubicacion = ubicacion;
+        this.latitud = latitud;
+        this.longitud = longitud;
     }
 
     public String getNombre() {
@@ -43,5 +47,21 @@ public class EspacioPublico {
 
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
 }

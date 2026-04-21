@@ -1,6 +1,6 @@
 #FileLock
-#Sun Apr 19 18:26:20 CEST 2026
-server=192.168.1.47\:59949
-hostName=PCdeElena
+#Tue Apr 21 12:47:18 CEST 2026
+server=169.254.10.141\:57124
+hostName=pc-1599235148
 method=file
-id=19da6907448b681d38b220e7759c5d7f2ef835ccdb5
+id=19dafa6a5084020d4d206a0cffe16965fe8142f33c7

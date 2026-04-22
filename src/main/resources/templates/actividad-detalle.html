@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${actividad.tipo} + ' | UrbanActive'">Detalle actividad</title>
+  <title th:text="${actividad.titulo} + ' | UrbanActive'">Detalle actividad</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/actividad-detalle.css}">
@@ -29,7 +29,9 @@
 
     <section class="hero-card">
       <div class="hero-image-wrapper">
-        <img th:src="${actividad.imagen}" src="/img/default.jpg" alt="Imagen actividad">
+        <img th:src="${actividad.imagen != null ? actividad.imagen : '/img/default.jpg'}" 
+             alt="Imagen actividad" 
+             onerror="this.src='https://via.placeholder.com/800x400?text=UrbanActive'">
         <a th:href="@{/actividades}" class="back-btn">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
@@ -42,36 +44,32 @@
           <span class="badge bg-success ms-2">Pública</span>
         </div>
 
-        <h1 class="activity-title mb-2" th:text="${actividad.tipo}">Actividad</h1>
+        <h1 class="activity-title mb-2" th:text="${actividad.titulo}">Título</h1>
 
         <p class="lead text-muted mb-4">
-        Organizado por:
+          Organizado por:
 
-        <!-- SI ES ORGANIZACIÓN -->
-        <a th:if="${actividad.organizacion != null}"
-          th:href="@{/organizaciones/{tipo}/{numero}(
-              tipo=${actividad.organizacion.identificacion.tipo},
-              numero=${actividad.organizacion.identificacion.numero}
-          )}"
-      class="fw-bold text-decoration-none text-primary">
-      <span th:text="${actividad.organizacion.nombre}">Organización</span>
-      </a>
-
-        <!-- SI ES USUARIO -->
-        <a th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}"
-          th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
-          class="fw-bold text-decoration-none text-primary">
-        <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
+          <a th:if="${actividad.organizacion != null and actividad.organizacion.identificacion != null}"
+             th:href="@{/organizaciones/{tipo}/{numero}(
+                 tipo=${actividad.organizacion.identificacion.tipo},
+                 numero=${actividad.organizacion.identificacion.numero}
+             )}"
+             class="fw-bold text-decoration-none text-primary">
+            <span th:text="${actividad.organizacion.nombre}">Organización</span>
           </a>
 
-        <!-- SI NO HAY -->
-        <span th:if="${actividad.organizacion == null and actividad.usuarioOrganizador == null}">
-          Sin organizador
-        </span>
+          <a th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}"
+             th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
+             class="fw-bold text-decoration-none text-primary">
+            <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
+          </a>
+
+          <span th:if="${actividad.organizacion == null and actividad.usuarioOrganizador == null}">
+            Organizador independiente
+          </span>
         </p>
 
         <div class="info-grid mb-4">
-
           <div class="info-mini">
             <i class="fa-regular fa-calendar"></i>
             <div>
@@ -100,111 +98,80 @@
             <i class="fa-regular fa-star text-primary"></i>
             <div>
               <div class="fw-semibold">Nivel</div>
-              <div th:text="${actividad.nivel}"></div>
+              <div th:text="${actividad.nivel != null ? actividad.nivel : 'General'}"></div>
             </div>
           </div>
-
         </div>
 
-        <div class="info-mini">
-          <i class="fa-regular fa-star"></i>
+        <div class="info-mini mb-4" th:if="${actividad.organizacion != null and actividad.organizacion.valoracion != null}">
+          <i class="fa-solid fa-star text-warning"></i>
           <div>
             <div class="fw-semibold">Valoración</div>
-            <div th:text="${actividad.organizacion.valoracion}"></div>
+            <div th:text="${actividad.organizacion.valoracion.puntuacion} + ' ' + ${actividad.organizacion.valoracion.estrellas}"></div>
           </div>
         </div>
 
         <div class="card-custom">
           <div class="fw-semibold mb-2">Ubicación</div>
-          <div th:text="${actividad.espacioPublico.nombre}"></div>
+          <div th:text="${actividad.espacioPublico != null ? actividad.espacioPublico.nombre : 'Ubicación personalizada'}"></div>
+          <div class="small text-muted" th:if="${actividad.espacioPublico == null}" 
+               th:text="${actividad.latitud} + ', ' + ${actividad.longitud}"></div>
         </div>
-
       </div>
     </section>
 
     <aside>
-
       <div class="metrics-row">
-
         <div class="card-metric weather-card">
           <div class="metric-title">Clima</div>
-
           <div th:if="${contexto != null and contexto.weather != null}">
             <div class="weather-main" th:text="${contexto.weather.estadoCielo}"></div>
             <div class="weather-temp" th:text="${contexto.weather.temperatura}"></div>
-            <div class="metric-text">
-              <span th:text="${contexto.weather.viento}"></span>
-              <span th:if="${contexto.weather.probabilidadLluvia != null}"
-                    th:text="' · ' + ${contexto.weather.probabilidadLluvia}"></span>
-            </div>
           </div>
-
           <div th:if="${contexto == null or contexto.weather == null}">
             <div class="weather-main">No disponible</div>
-            <div class="weather-temp">-</div>
-            <div class="metric-text">- - -</div>
+            <div class="metric-text">Sin datos de clima</div>
           </div>
         </div>
 
         <div class="card-metric traffic-card">
           <div class="metric-title">Trayecto</div>
-
           <div th:if="${contexto != null and contexto.traffic != null}">
-            <div class="traffic-level"
-                 th:classappend="${contexto.traffic.nivel == 'Bajo' ? 'traffic-low' :
-                                (contexto.traffic.nivel == 'Medio' ? 'traffic-medium' : 'traffic-high')}"
-                 th:text="${contexto.traffic.nivel}">
-            </div>
-
+            <div class="traffic-level" th:text="${contexto.traffic.nivel}"></div>
             <div class="metric-text" th:text="${contexto.traffic.resumen}"></div>
           </div>
-
           <div th:if="${contexto == null or contexto.traffic == null}" class="metric-text">
-            No hay datos de trayecto
+            Sin datos de trayecto
           </div>
         </div>
-
       </div>
 
       <div class="price-box text-start">
         <div class="price-label">Precio</div>
-        <div class="price-value" th:text="${actividad.precio} + ' €'"></div>
+        <div class="price-value" th:text="${actividad.precio != null and actividad.precio > 0 ? actividad.precio + ' €' : 'Gratis'}"></div>
       </div>
 
       <form th:action="@{/reservas/procesar}" method="post" class="reserve-form">
         <input type="hidden" name="actividadId" th:value="${actividad.id}">
-
-        <button type="submit"
-                class="btn btn-primary reserve-btn"
+        <button type="submit" class="btn btn-primary reserve-btn" 
                 th:disabled="${yaReservada or actividad.plazasDisponibles <= 0}">
-
-          <span th:text="${yaReservada ? 'Ya reservada' : (actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas disponibles')}">
-            Reservar plaza ahora
-          </span>
+          <span th:text="${yaReservada ? 'Ya reservada' : (actividad.plazasDisponibles > 0 ? 'Reservar plaza ahora' : 'Sin plazas')}"></span>
         </button>
       </form>
-
-      <p class="reserve-note">
-        Al reservar, aceptas nuestras normas de uso urbano.
-      </p>
     </aside>
-
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const url = new URL(window.location.href);
-
   if (!url.searchParams.has("userLat") || !url.searchParams.has("userLon")) {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
+      navigator.geolocation.getCurrentPosition(function(position) {
           url.searchParams.set("userLat", position.coords.latitude);
           url.searchParams.set("userLon", position.coords.longitude);
           window.location.replace(url.toString());
-        }
-      );
+      });
     }
   }
 });

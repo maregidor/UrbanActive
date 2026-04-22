@@ -50,27 +50,12 @@ public class ActividadService {
     }
 
     public Actividad guardarActividad(Actividad actividad) {
-        if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
-            try {
-                String direccion = "";
-
-                if (actividad.getEspacioPublico() != null) {
-                    direccion = actividad.getEspacioPublico().getNombre() + ", " +
-                            actividad.getEspacioPublico().getUbicacion() + ", Madrid, España";
-                }
-
-                if (!direccion.isEmpty()) {
-                    GeoPoint punto = geocodingService.buscar(direccion);
-
-                    if (punto != null) {
-                        actividad.setLatitud(punto.lat());
-                        actividad.setLongitud(punto.lon());
-                    }
-                }
-
-            } catch (Exception e) {
-                System.out.println("Error geocoding: " + e.getMessage());
-            }
+        if (actividad.getEspacioPublico() != null) {
+            actividad.setLatitud(actividad.getEspacioPublico().getLatitud());
+            actividad.setLongitud(actividad.getEspacioPublico().getLongitud());
+        } 
+        else if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
+            throw new IllegalArgumentException("La actividad debe tener una ubicación (Espacio Público o Coordenadas manuales)");
         }
 
         return actividadRepository.save(actividad);
@@ -78,7 +63,6 @@ public class ActividadService {
     
     public void crearNuevaActividad(Actividad actividad, String idPrincipal) {
         Optional<Organizacion> org = organizacionRepository.findByIdentificacionNumero(idPrincipal);
-    
         if (org.isPresent()) {
             actividad.setOrganizacion(org.get());
             actividad.setUsuarioOrganizador(null);
@@ -86,12 +70,15 @@ public class ActividadService {
             Usuario usuario = usuarioRepository.findById(new Email(idPrincipal)).orElse(null);
             actividad.setUsuarioOrganizador(usuario);
             actividad.setOrganizacion(null);
-            actividad.setPrecio(0.0); // Forzamos gratis para usuarios normales
+            actividad.setPrecio(0.0);
         }
 
         if (actividad.getEspacioPublico() != null) {
             actividad.setLatitud(actividad.getEspacioPublico().getLatitud());
             actividad.setLongitud(actividad.getEspacioPublico().getLongitud());
+        } 
+        else if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
+            throw new IllegalArgumentException("La actividad debe tener una ubicación (Espacio Público o Coordenadas manuales)");
         }
 
         actividad.setPlazasDisponibles(actividad.getPlazasTotales());

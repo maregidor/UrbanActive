@@ -63,66 +63,11 @@ public class Actividad {
 
     public Actividad() {}
 
+    // --- MÉTODOS DE LÓGICA ---
     public String getNombreOrganizador() {
         if (this.organizacion != null) return organizacion.getNombre();
         if (this.usuarioOrganizador != null) return usuarioOrganizador.getNombre();
         return "Sin organizador";
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public Nivel getNivel() {
-        return nivel;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public LocalTime getHora() {
-        return hora;
-    }
-
-    public String getDuracion() {
-        return duracion;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public Organizacion getOrganizacion() {
-        return organizacion;
-    }
-
-    public EspacioPublico getEspacioPublico() {
-        return espacioPublico;
-    }
-
-    public CondicionEntorno getCondicionesEntorno() {
-        return condicionesEntorno;
-    }
-
-    public List<Reserva> getReservas() {
-        return reservas;
     }
 
     public List<Usuario> getParticipantes() {
@@ -135,95 +80,45 @@ public class Actividad {
         return participantes;
     }
 
-    public int getPlazasTotales() {
-        return plazasTotales;
-    }
+    // --- GETTERS (El de usuarioOrganizador es la clave del error) ---
+    public Usuario getUsuarioOrganizador() { return usuarioOrganizador; }
+    public Long getId() { return id; }
+    public String getTipo() { return tipo; }
+    public String getTitulo() { return titulo; }
+    public String getDescripcion() { return descripcion; }
+    public Nivel getNivel() { return nivel; }
+    public LocalDate getFecha() { return fecha; }
+    public LocalTime getHora() { return hora; }
+    public String getDuracion() { return duracion; }
+    public String getImagen() { return imagen; }
+    public Double getPrecio() { return precio; }
+    public Organizacion getOrganizacion() { return organizacion; }
+    public EspacioPublico getEspacioPublico() { return espacioPublico; }
+    public CondicionEntorno getCondicionesEntorno() { return condicionesEntorno; }
+    public List<Reserva> getReservas() { return reservas; }
+    public int getPlazasTotales() { return plazasTotales; }
+    public int getPlazasDisponibles() { return plazasDisponibles; }
+    public Double getLatitud() { return latitud; }
+    public Double getLongitud() { return longitud; }
 
-    public Double getLatitud() { 
-        return latitud; 
-    }
-
-    public Double getLongitud() {
-         return longitud;
-    }
-
-    public void setPlazasTotales(int plazasTotales) {
-        this.plazasTotales = plazasTotales;
-    }
-
-    public int getPlazasDisponibles() {
-        return plazasDisponibles;
-    }
-
-    public void setPlazasDisponibles(int plazasDisponibles) {
-        this.plazasDisponibles = plazasDisponibles;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public void setNivel(Nivel nivel) {
-        this.nivel = nivel;
-    }
-
-    public void setUsuarioOrganizador(Usuario usuarioOrganizador) {
-        this.usuarioOrganizador = usuarioOrganizador;
-    }
-
-    public void setOrganizacion(Organizacion organizacion) {
-        this.organizacion = organizacion;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
-    }
-
-    public void setDuracion(String duracion) {
-        this.duracion = duracion;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
-    }
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
-
-    public void setEspacioPublico(EspacioPublico espacioPublico) {
-        this.espacioPublico = espacioPublico;
-    }
-
-    public void setCondicionesEntorno(CondicionEntorno condicionesEntorno) {
-        this.condicionesEntorno = condicionesEntorno;
-    }
-
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
-    }
-
-    public void setLatitud(Double latitud) { 
-        this.latitud = latitud; 
-    }
-    
-    public void setLongitud(Double longitud) { 
-        this.longitud = longitud;
-    }
+    // --- SETTERS ---
+    public void setPlazasTotales(int plazasTotales) { this.plazasTotales = plazasTotales; }
+    public void setPlazasDisponibles(int plazasDisponibles) { this.plazasDisponibles = plazasDisponibles; }
+    public void setId(Long id) { this.id = id; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setNivel(Nivel nivel) { this.nivel = nivel; }
+    public void setUsuarioOrganizador(Usuario usuarioOrganizador) { this.usuarioOrganizador = usuarioOrganizador; }
+    public void setOrganizacion(Organizacion organizacion) { this.organizacion = organizacion; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public void setHora(LocalTime hora) { this.hora = hora; }
+    public void setDuracion(String duracion) { this.duracion = duracion; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
+    public void setPrecio(Double precio) { this.precio = precio; }
+    public void setEspacioPublico(EspacioPublico espacioPublico) { this.espacioPublico = espacioPublico; }
+    public void setCondicionesEntorno(CondicionEntorno condicionesEntorno) { this.condicionesEntorno = condicionesEntorno; }
+    public void setReservas(List<Reserva> reservas) { this.reservas = reservas; }
+    public void setLatitud(Double latitud) { this.latitud = latitud; }
+    public void setLongitud(Double longitud) { this.longitud = longitud; }
 }

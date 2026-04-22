@@ -32,9 +32,11 @@ public class ActividadContextService {
                     actividad.getTitulo()
             );
         } else if (actividad.getEspacioPublico() != null) {
-            String direccion = actividad.getEspacioPublico().getNombre() + ", "
-                    + actividad.getEspacioPublico().getUbicacion() + ", Madrid, España";
-            puntoActividad = geocodingService.buscar(direccion);
+            puntoActividad = new GeoPoint(
+                actividad.getEspacioPublico().getLatitud(),
+                actividad.getEspacioPublico().getLongitud(),
+                actividad.getEspacioPublico().getNombre()
+            );
         }
 
         WeatherInfo weather = aemetService.getWeatherMadrid(actividad.getFecha());

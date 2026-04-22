@@ -2,6 +2,7 @@ package es.upm.dit.isst.grupo10.urbanactive.controller;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
+import es.upm.dit.isst.grupo10.urbanactive.model.EspacioPublico;
 import es.upm.dit.isst.grupo10.urbanactive.model.Identificacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
@@ -69,12 +70,6 @@ public String listarActividades(
     return "actividades";
 }
 
-@GetMapping("/actividades/crear")
-public String mostrarFormularioCrearActividad(Model model) {
-    model.addAttribute("actividad", new Actividad());
-    return "crear-actividad";
-}
-
 @GetMapping("/actividades/{id}")
 public String verDetalle(@PathVariable Long id,
                          @RequestParam(required = false) Double userLat,
@@ -110,11 +105,14 @@ public String verDetalle(@PathVariable Long id,
 public String mostrarFormularioCrear(Model model) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String username = auth.getName();
-    Optional<Organizacion> org = organizacionRepository.findByIdentificacionNumero(username);
-    boolean esOrganizador = org.isPresent();
 
+    List<EspacioPublico> listaEspacios = espacioPublicoRepository.findAll();
+    boolean esOrganizador = organizacionRepository.findByIdentificacionNumero(username).isPresent();
+   
+    System.out.println("DEBUG: Cargando " + listaEspacios.size() + " espacios para el formulario");
+
+    model.addAttribute("espacios", listaEspacios); 
     model.addAttribute("actividad", new Actividad());
-    model.addAttribute("espacios", espacioPublicoRepository.findAll());
     model.addAttribute("esOrganizador", esOrganizador);
     
     return "crear-actividad";

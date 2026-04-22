@@ -23,6 +23,10 @@ public class EspacioPublico {
         this.longitud = longitud;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getNombre() {
         return nombre;
     }

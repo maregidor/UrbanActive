@@ -1,6 +1,7 @@
 package es.upm.dit.isst.grupo10.urbanactive.repository;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
+import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +13,8 @@ public interface ActividadRepository extends JpaRepository<Actividad, Long>  {
     List<Actividad> findAllByOrderByFechaAsc();
     List<Actividad> findAllByOrderByPrecioAsc();
     List<Actividad> findAllByOrderByOrganizacion_Valoracion_PuntuacionDesc();
-long countByUsuarioOrganizador(Usuario usuarioOrganizador);
+    long countByUsuarioOrganizador(Usuario usuarioOrganizador);
+    List<Actividad> findByUsuarioOrganizador(Usuario usuario);
+
+List<Actividad> findByOrganizacion(Organizacion organizacion);
 }

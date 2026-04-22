@@ -49,9 +49,8 @@
 
         <!-- SI ES ORGANIZACIÓN -->
         <a th:if="${actividad.organizacion != null}"
-          th:href="@{/organizaciones/{tipo}/{numero}(
-              tipo=${actividad.organizacion.identificacion.tipo},
-              numero=${actividad.organizacion.identificacion.numero}
+          th:href="@{/organizaciones/{slug} (
+              slug=${actividad.organizacion.slug}
           )}"
       class="fw-bold text-decoration-none text-primary">
       <span th:text="${actividad.organizacion.nombre}">Organización</span>

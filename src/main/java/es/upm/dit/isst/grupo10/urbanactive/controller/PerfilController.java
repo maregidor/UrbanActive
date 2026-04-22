@@ -1,7 +1,6 @@
 package es.upm.dit.isst.grupo10.urbanactive.controller;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
-import es.upm.dit.isst.grupo10.urbanactive.model.Identificacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoOrganizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoUsuario;
@@ -22,166 +21,168 @@ import java.util.Optional;
 @Controller
 public class PerfilController {
 
-    private final ActividadRepository actividadRepository;
-    private final OrganizacionRepository organizacionRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final SeguimientoOrganizacionRepository seguimientoOrganizacionRepository;
-    private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
+private final ActividadRepository actividadRepository;
+private final OrganizacionRepository organizacionRepository;
+private final UsuarioRepository usuarioRepository;
+private final SeguimientoOrganizacionRepository seguimientoOrganizacionRepository;
+private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
 
-    public PerfilController(ActividadRepository actividadRepository,
-                            OrganizacionRepository organizacionRepository,
-                            UsuarioRepository usuarioRepository,
-                            SeguimientoOrganizacionRepository seguimientoOrganizacionRepository,
-                            SeguimientoUsuarioRepository seguimientoUsuarioRepository) {
-        this.actividadRepository = actividadRepository;
-        this.organizacionRepository = organizacionRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.seguimientoOrganizacionRepository = seguimientoOrganizacionRepository;
-        this.seguimientoUsuarioRepository = seguimientoUsuarioRepository;
-    }
+public PerfilController(ActividadRepository actividadRepository,
+OrganizacionRepository organizacionRepository,
+UsuarioRepository usuarioRepository,
+SeguimientoOrganizacionRepository seguimientoOrganizacionRepository,
+SeguimientoUsuarioRepository seguimientoUsuarioRepository) {
+this.actividadRepository = actividadRepository;
+this.organizacionRepository = organizacionRepository;
+this.usuarioRepository = usuarioRepository;
+this.seguimientoOrganizacionRepository = seguimientoOrganizacionRepository;
+this.seguimientoUsuarioRepository = seguimientoUsuarioRepository;
+}
 
-    @GetMapping("/usuarios/{email}")
-    public String verPerfilUsuario(@PathVariable String email,
-                                   Model model) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(new Email(email));
+@GetMapping("/usuarios/{email}")
+public String verPerfilUsuario(@PathVariable String email, Model model) {
+Optional<Usuario> usuarioOpt = usuarioRepository.findById(new Email(email));
 
-        if (usuarioOpt.isEmpty()) {
-            return "redirect:/actividades";
-        }
+if (usuarioOpt.isEmpty()) {
+return "redirect:/actividades";
+}
 
-        Usuario perfil = usuarioOpt.get();
-        Usuario usuarioActual = getUsuarioAutenticado();
+Usuario perfil = usuarioOpt.get();
+Usuario usuarioActual = getUsuarioAutenticado();
 
-        boolean esMiPerfil = usuarioActual != null
-                && usuarioActual.getEmail().equals(perfil.getEmail());
-        boolean yaLeSigue = usuarioActual != null
-                && !esMiPerfil
-                && seguimientoUsuarioRepository.existsBySeguidorAndSeguido(usuarioActual, perfil);
+boolean esMiPerfil = usuarioActual != null
+&& usuarioActual.getEmail().equals(perfil.getEmail());
 
-        long numSeguidores = seguimientoUsuarioRepository.countBySeguido(perfil);
-        long numSeguidos = seguimientoUsuarioRepository.countBySeguidor(perfil);
-        long numActividades = actividadRepository.countByUsuarioOrganizador(perfil);
+boolean yaLeSigue = usuarioActual != null
+&& !esMiPerfil
+&& seguimientoUsuarioRepository.existsBySeguidorAndSeguido(usuarioActual, perfil);
 
-        model.addAttribute("perfil", perfil);
-        model.addAttribute("esMiPerfil", esMiPerfil);
-        model.addAttribute("yaLeSigue", yaLeSigue);
-        model.addAttribute("numSeguidores", numSeguidores);
-        model.addAttribute("numSeguidos", numSeguidos);
-        model.addAttribute("numActividades", numActividades);
+long numSeguidores = seguimientoUsuarioRepository.countBySeguido(perfil);
+long numSeguidos = seguimientoUsuarioRepository.countBySeguidor(perfil);
+long numActividades = actividadRepository.countByUsuarioOrganizador(perfil);
 
-        return "perfil-usuario";
-    }
+model.addAttribute("perfil", perfil);
+model.addAttribute("esMiPerfil", esMiPerfil);
+model.addAttribute("yaLeSigue", yaLeSigue);
+model.addAttribute("numSeguidores", numSeguidores);
+model.addAttribute("numSeguidos", numSeguidos);
+model.addAttribute("numActividades", numActividades);
+model.addAttribute("actividades", actividadRepository.findByUsuarioOrganizador(perfil));
 
-    @GetMapping("/organizaciones/{tipo}/{numero}")
-    public String verPerfilOrganizacion(@PathVariable String tipo,
-                                        @PathVariable String numero,
-                                        Model model) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
+return "perfil-usuario";
+}
 
-        if (organizacionOpt.isEmpty()) {
-            return "redirect:/actividades";
-        }
+@GetMapping("/organizaciones/{slug}")
+public String verPerfilOrganizacion(@PathVariable String slug, Model model) {
+Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
 
-        Organizacion perfil = organizacionOpt.get();
-        Usuario usuarioActual = getUsuarioAutenticado();
+if (organizacionOpt.isEmpty()) {
+return "redirect:/actividades";
+}
 
-        boolean yaLaSigue = false;
-        if (usuarioActual != null) {
-            yaLaSigue = seguimientoOrganizacionRepository
-                    .existsBySeguidorAndOrganizacion(usuarioActual, perfil);
-        }
+Organizacion organizacion = organizacionOpt.get();
+Usuario usuarioActual = getUsuarioAutenticado();
 
-        long numSeguidores = seguimientoOrganizacionRepository.countByOrganizacion(perfil);
+boolean yaLaSigue = usuarioActual != null
+&& seguimientoOrganizacionRepository.existsBySeguidorAndOrganizacion(usuarioActual, organizacion);
 
-        // Mantiene compatibilidad con la plantilla actual y con futuros usos del nombre "perfil".
-        model.addAttribute("perfil", perfil);
-        model.addAttribute("organizacion", perfil);
-        model.addAttribute("yaLaSigue", yaLaSigue);
-        model.addAttribute("numSeguidores", numSeguidores);
+long numSeguidores = seguimientoOrganizacionRepository.countByOrganizacion(organizacion);
 
-        return "perfil-organizacion";
-    }
+model.addAttribute("organizacion", organizacion);
+model.addAttribute("yaLaSigue", yaLaSigue);
+model.addAttribute("numSeguidores", numSeguidores);
+model.addAttribute("actividades", actividadRepository.findByOrganizacion(organizacion));
 
-    @PostMapping("/organizaciones/{tipo}/{numero}/seguir")
-    public String seguirOrganizacion(@PathVariable String tipo,
-                                     @PathVariable String numero) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
-        Usuario usuarioActual = getUsuarioAutenticado();
+return "perfil-organizacion";
+}
 
-        if (organizacionOpt.isPresent() && usuarioActual != null) {
-            Organizacion organizacion = organizacionOpt.get();
+@PostMapping("/organizaciones/{slug}/seguir")
+public String seguirOrganizacion(@PathVariable String slug, Model model) {
+Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
+Usuario usuarioActual = getUsuarioAutenticado();
 
-            boolean yaExiste = seguimientoOrganizacionRepository
-                    .existsBySeguidorAndOrganizacion(usuarioActual, organizacion);
+if (organizacionOpt.isEmpty() || usuarioActual == null) {
+return "redirect:/actividades";
+}
 
-            if (!yaExiste) {
-                seguimientoOrganizacionRepository
-                        .save(new SeguimientoOrganizacion(usuarioActual, organizacion));
-            }
-        }
+Organizacion organizacion = organizacionOpt.get();
 
-        return "redirect:/organizaciones/" + tipo + "/" + numero;
-    }
+boolean yaExiste = seguimientoOrganizacionRepository
+.existsBySeguidorAndOrganizacion(usuarioActual, organizacion);
 
-    @PostMapping("/organizaciones/{tipo}/{numero}/dejar-seguir")
-    public String dejarSeguirOrganizacion(@PathVariable String tipo,
-                                          @PathVariable String numero) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
-        Usuario usuarioActual = getUsuarioAutenticado();
+if (!yaExiste) {
+seguimientoOrganizacionRepository
+.save(new SeguimientoOrganizacion(usuarioActual, organizacion));
+}
 
-        if (organizacionOpt.isPresent() && usuarioActual != null) {
-            seguimientoOrganizacionRepository
-                    .findBySeguidorAndOrganizacion(usuarioActual, organizacionOpt.get())
-                    .ifPresent(seguimientoOrganizacionRepository::delete);
-        }
+model.addAttribute("nombreSeguido", organizacion.getNombre());
+model.addAttribute("mensajeExito", "Ahora sigues a esta organización.");
+model.addAttribute("slugOrganizacion", organizacion.getSlug());
 
-        return "redirect:/organizaciones/" + tipo + "/" + numero;
-    }
+return "seguido-confirmacion";
+}
 
-    @PostMapping("/usuarios/{email}/seguir")
-    public String seguirUsuario(@PathVariable String email) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
-        Usuario usuarioActual = getUsuarioAutenticado();
+@PostMapping("/organizaciones/{slug}/dejar-seguir")
+public String dejarSeguirOrganizacion(@PathVariable String slug) {
+Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
+Usuario usuarioActual = getUsuarioAutenticado();
 
-        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
-            Usuario usuarioPerfil = usuarioPerfilOpt.get();
-            boolean esMiPerfil = usuarioActual.getEmail().equals(usuarioPerfil.getEmail());
-            boolean yaExiste = seguimientoUsuarioRepository
-                    .existsBySeguidorAndSeguido(usuarioActual, usuarioPerfil);
+if (organizacionOpt.isPresent() && usuarioActual != null) {
+seguimientoOrganizacionRepository
+.findBySeguidorAndOrganizacion(usuarioActual, organizacionOpt.get())
+.ifPresent(seguimientoOrganizacionRepository::delete);
+}
 
-            if (!esMiPerfil && !yaExiste) {
-                seguimientoUsuarioRepository
-                        .save(new SeguimientoUsuario(usuarioActual, usuarioPerfil));
-            }
-        }
+return "redirect:/organizaciones/" + slug;
+}
 
-        return "redirect:/usuarios/" + email;
-    }
+@PostMapping("/usuarios/{email}/seguir")
+public String seguirUsuario(@PathVariable String email, Model model) {
+Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+Usuario usuarioActual = getUsuarioAutenticado();
 
-    @PostMapping("/usuarios/{email}/dejar-seguir")
-    public String dejarSeguirUsuario(@PathVariable String email) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
-        Usuario usuarioActual = getUsuarioAutenticado();
+if (usuarioPerfilOpt.isEmpty() || usuarioActual == null) {
+return "redirect:/actividades";
+}
 
-        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
-            seguimientoUsuarioRepository
-                    .findBySeguidorAndSeguido(usuarioActual, usuarioPerfilOpt.get())
-                    .ifPresent(seguimientoUsuarioRepository::delete);
-        }
+Usuario usuarioPerfil = usuarioPerfilOpt.get();
+boolean esMiPerfil = usuarioActual.getEmail().equals(usuarioPerfil.getEmail());
+boolean yaExiste = seguimientoUsuarioRepository
+.existsBySeguidorAndSeguido(usuarioActual, usuarioPerfil);
 
-        return "redirect:/usuarios/" + email;
-    }
+if (!esMiPerfil && !yaExiste) {
+seguimientoUsuarioRepository
+.save(new SeguimientoUsuario(usuarioActual, usuarioPerfil));
+}
 
-    private Usuario getUsuarioAutenticado() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+model.addAttribute("nombreSeguido", usuarioPerfil.getNombre());
+model.addAttribute("mensajeExito", "Ahora sigues a este usuario.");
+model.addAttribute("emailUsuario", usuarioPerfil.getEmail().getDireccion());
 
-        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
-            return null;
-        }
+return "seguir-exito";
+}
 
-        return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
-    }
+@PostMapping("/usuarios/{email}/dejar-seguir")
+public String dejarSeguirUsuario(@PathVariable String email) {
+Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+Usuario usuarioActual = getUsuarioAutenticado();
+
+if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
+seguimientoUsuarioRepository
+.findBySeguidorAndSeguido(usuarioActual, usuarioPerfilOpt.get())
+.ifPresent(seguimientoUsuarioRepository::delete);
+}
+
+return "redirect:/usuarios/" + email;
+}
+
+private Usuario getUsuarioAutenticado() {
+Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+return null;
+}
+
+return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
+}
 }

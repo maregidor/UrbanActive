@@ -96,7 +96,13 @@ public class DataInitializer implements CommandLineRunner {
             madridActivo, madridRio, 40.4045, -3.7170, 40, 
             "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e"));
 
-        System.out.println("¡Datos cargados con éxito! Se han creado 6 actividades y 3 organizaciones.");
+        // Actividad 7: Running con Juan (Usuario creador, Retiro)
+        actividadRepository.save(crearActividadUsuario("Running con Juan", "Cardio", 0.0, 4.0,
+            LocalDate.now().plusDays(6), LocalTime.of(9, 30),
+            juan, retiro, 40.4153, -3.6839, 20,
+            "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8"));    
+
+        System.out.println("¡Datos cargados con éxito! Se han creado 7 actividades y 3 organizaciones.");
     }
 
     // Método auxiliar para limpiar el código de creación de actividades
@@ -119,6 +125,32 @@ public class DataInitializer implements CommandLineRunner {
         a.setImagen(img);
         a.setDuracion("60 min");
         a.setDescripcion("Actividad de " + tipo + " organizada por " + org.getNombre());
+        return a;
+    }
+
+    private Actividad crearActividadUsuario(String titulo, String tipo, Double precio, Double nivelVal,
+                                            LocalDate fecha, LocalTime hora, Usuario usuario,
+                                            EspacioPublico esp, Double lat, Double lon, int plazas, String img) {
+        Actividad a = new Actividad();
+        a.setTitulo(titulo);
+        a.setTipo(tipo);
+        a.setPrecio(precio);
+        a.setNivel(new Nivel(nivelVal));
+        a.setFecha(fecha);
+        a.setHora(hora);
+
+        a.setUsuarioOrganizador(usuario);
+        a.setOrganizacion(null);
+
+        a.setEspacioPublico(esp);
+        a.setLatitud(lat);
+        a.setLongitud(lon);
+        a.setPlazasTotales(plazas);
+        a.setPlazasDisponibles(plazas);
+        a.setImagen(img);
+        a.setDuracion("60 min");
+        a.setDescripcion("Actividad de " + tipo + " organizada por " + usuario.getNombre());
+
         return a;
     }
 }

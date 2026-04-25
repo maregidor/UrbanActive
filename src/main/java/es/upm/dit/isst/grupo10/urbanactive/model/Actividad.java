@@ -56,7 +56,7 @@ public class Actividad {
         joinColumns = @JoinColumn(name="actividad_id"),
         inverseJoinColumns = @JoinColumn(name="reserva_id")
     )
-    private List <Reserva> reservas = new ArrayList<>();
+    private List<Reserva> reservas = new ArrayList<>();
 
     private Double latitud;
     private Double longitud;
@@ -109,6 +109,10 @@ public class Actividad {
         return precio;
     }
 
+    public Usuario getUsuarioOrganizador() {
+        return usuarioOrganizador;
+    }
+
     public Organizacion getOrganizacion() {
         return organizacion;
     }
@@ -139,24 +143,16 @@ public class Actividad {
         return plazasTotales;
     }
 
-    public Double getLatitud() { 
-        return latitud; 
-    }
-
-    public Double getLongitud() {
-         return longitud;
-    }
-
-    public void setPlazasTotales(int plazasTotales) {
-        this.plazasTotales = plazasTotales;
-    }
-
     public int getPlazasDisponibles() {
         return plazasDisponibles;
     }
 
-    public void setPlazasDisponibles(int plazasDisponibles) {
-        this.plazasDisponibles = plazasDisponibles;
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
     }
 
     public void setId(Long id) {
@@ -219,11 +215,19 @@ public class Actividad {
         this.reservas = reservas;
     }
 
-    public void setLatitud(Double latitud) { 
-        this.latitud = latitud; 
+    public void setPlazasTotales(int plazasTotales) {
+        this.plazasTotales = plazasTotales;
     }
-    
-    public void setLongitud(Double longitud) { 
+
+    public void setPlazasDisponibles(int plazasDisponibles) {
+        this.plazasDisponibles = plazasDisponibles;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
 }

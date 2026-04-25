@@ -45,28 +45,25 @@
         <h1 class="activity-title mb-2" th:text="${actividad.tipo}">Actividad</h1>
 
         <p class="lead text-muted mb-4">
-        Organizado por:
+          Organizado por:
 
-        <!-- SI ES ORGANIZACIÓN -->
-        <a th:if="${actividad.organizacion != null}"
-          th:href="@{/organizaciones/{slug} (
-              slug=${actividad.organizacion.slug}
-          )}"
-      class="fw-bold text-decoration-none text-primary">
-      <span th:text="${actividad.organizacion.nombre}">Organización</span>
-      </a>
+          <th:block th:if="${actividad.organizacion != null}">
+            <a th:href="@{/organizaciones/{slug}(slug=${actividad.organizacion.slug})}"
+               class="fw-bold text-decoration-none text-primary">
+              <span th:text="${actividad.organizacion.nombre}">Organización</span>
+            </a>
+          </th:block>
 
-        <!-- SI ES USUARIO -->
-        <a th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}"
-          th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
-          class="fw-bold text-decoration-none text-primary">
-        <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
-          </a>
+          <th:block th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}">
+            <a th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
+               class="fw-bold text-decoration-none text-primary">
+              <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
+            </a>
+          </th:block>
 
-        <!-- SI NO HAY -->
-        <span th:if="${actividad.organizacion == null and actividad.usuarioOrganizador == null}">
-          Sin organizador
-        </span>
+          <th:block th:if="${actividad.organizacion == null and actividad.usuarioOrganizador == null}">
+            <span>Sin organizador</span>
+          </th:block>
         </p>
 
         <div class="info-grid mb-4">
@@ -75,7 +72,7 @@
             <i class="fa-regular fa-calendar"></i>
             <div>
               <div class="fw-semibold">Fecha</div>
-              <div th:text="${actividad.fecha}"></div>
+              <div th:text="${actividad.fecha}">Fecha</div>
             </div>
           </div>
 
@@ -83,7 +80,7 @@
             <i class="fa-regular fa-clock"></i>
             <div>
               <div class="fw-semibold">Hora</div>
-              <div th:text="${actividad.hora}"></div>
+              <div th:text="${actividad.hora}">Hora</div>
             </div>
           </div>
 
@@ -91,7 +88,7 @@
             <i class="fa-solid fa-users"></i>
             <div>
               <div class="fw-semibold">Plazas libres</div>
-              <div th:text="${actividad.plazasDisponibles}"></div>
+              <div th:text="${actividad.plazasDisponibles}">0</div>
             </div>
           </div>
 
@@ -99,7 +96,7 @@
             <i class="fa-regular fa-star text-primary"></i>
             <div>
               <div class="fw-semibold">Nivel</div>
-              <div th:text="${actividad.nivel}"></div>
+              <div th:text="${actividad.nivel}">Nivel</div>
             </div>
           </div>
 
@@ -109,13 +106,28 @@
           <i class="fa-regular fa-star"></i>
           <div>
             <div class="fw-semibold">Valoración</div>
-            <div th:text="${actividad.organizacion.valoracion}"></div>
+
+            <th:block th:if="${actividad.organizacion != null and actividad.organizacion.valoracion != null}">
+              <div th:text="${actividad.organizacion.valoracion}">Valoración</div>
+            </th:block>
+
+            <th:block th:if="${actividad.organizacion == null or actividad.organizacion.valoracion == null}">
+              <div>Sin valoración</div>
+            </th:block>
           </div>
         </div>
 
         <div class="card-custom">
           <div class="fw-semibold mb-2">Ubicación</div>
-          <div th:text="${actividad.espacioPublico.nombre}"></div>
+
+          <div th:if="${actividad.espacioPublico != null}"
+               th:text="${actividad.espacioPublico.nombre}">
+            Ubicación
+          </div>
+
+          <div th:if="${actividad.espacioPublico == null}">
+            Ubicación no disponible
+          </div>
         </div>
 
       </div>
@@ -129,10 +141,10 @@
           <div class="metric-title">Clima</div>
 
           <div th:if="${contexto != null and contexto.weather != null}">
-            <div class="weather-main" th:text="${contexto.weather.estadoCielo}"></div>
-            <div class="weather-temp" th:text="${contexto.weather.temperatura}"></div>
+            <div class="weather-main" th:text="${contexto.weather.estadoCielo}">No disponible</div>
+            <div class="weather-temp" th:text="${contexto.weather.temperatura}">-</div>
             <div class="metric-text">
-              <span th:text="${contexto.weather.viento}"></span>
+              <span th:text="${contexto.weather.viento}">-</span>
               <span th:if="${contexto.weather.probabilidadLluvia != null}"
                     th:text="' · ' + ${contexto.weather.probabilidadLluvia}"></span>
             </div>
@@ -153,9 +165,12 @@
                  th:classappend="${contexto.traffic.nivel == 'Bajo' ? 'traffic-low' :
                                 (contexto.traffic.nivel == 'Medio' ? 'traffic-medium' : 'traffic-high')}"
                  th:text="${contexto.traffic.nivel}">
+              No disponible
             </div>
 
-            <div class="metric-text" th:text="${contexto.traffic.resumen}"></div>
+            <div class="metric-text" th:text="${contexto.traffic.resumen}">
+              No hay datos de trayecto
+            </div>
           </div>
 
           <div th:if="${contexto == null or contexto.traffic == null}" class="metric-text">
@@ -167,7 +182,9 @@
 
       <div class="price-box text-start">
         <div class="price-label">Precio</div>
-        <div class="price-value" th:text="${actividad.precio} + ' €'"></div>
+        <div class="price-value" th:text="${actividad.precio > 0 ? actividad.precio + ' €' : 'Gratis'}">
+          Gratis
+        </div>
       </div>
 
       <form th:action="@{/reservas/procesar}" method="post" class="reserve-form">

@@ -53,8 +53,10 @@
                 </div>
 
                 <form th:if="${!esMiPerfil and !yaLeSigue}" method="post"
-                      th:action="@{/usuarios/{email}/seguir(email=${perfil.email.direccion})}">
-                    <button class="btn btn-light btn-follow fw-semibold" type="submit">
+                    th:action="@{/usuarios/{email}/seguir(email=${perfil.email.direccion})}">
+                    <button class="btn btn-light btn-follow fw-semibold"
+                            type="submit"
+                            onclick="return confirm('Aviso de protección de datos: al seguir a este usuario, tu nombre de usuario podrá ser visible para esta cuenta como parte de su lista de seguidores. ¿Quieres continuar?')">
                         Seguir
                     </button>
                 </form>

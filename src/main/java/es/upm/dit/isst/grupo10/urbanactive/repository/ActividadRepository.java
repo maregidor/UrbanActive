@@ -15,6 +15,8 @@ public interface ActividadRepository extends JpaRepository<Actividad, Long>  {
     List<Actividad> findAllByOrderByOrganizacion_Valoracion_PuntuacionDesc();
     long countByUsuarioOrganizador(Usuario usuarioOrganizador);
     List<Actividad> findByUsuarioOrganizador(Usuario usuario);
+    List<Actividad> findByUsuarioOrganizadorIn(List<Usuario> usuarios);
+    List<Actividad> findByOrganizacionIn (List<Organizacion> organizaciones);
 
 List<Actividad> findByOrganizacion(Organizacion organizacion);
 }

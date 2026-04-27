@@ -2,6 +2,7 @@ package es.upm.dit.isst.grupo10.urbanactive.controller;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
+import es.upm.dit.isst.grupo10.urbanactive.model.Nivel;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoOrganizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoUsuario;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -226,4 +228,45 @@ model.addAttribute("organizacionesSeguidas", organizacionesSeguidas);
 model.addAttribute("actividades", actividades);
 
 return "mis-seguidos";
-}}
+}
+@GetMapping("/mi-perfil")
+public String verMiPerfil(Model model) {
+Usuario usuarioActual = getUsuarioAutenticado();
+
+if (usuarioActual == null) {
+return "redirect:/login";
+}
+
+model.addAttribute("usuario", usuarioActual);
+return "mi-perfil";
+}
+
+@GetMapping("/mi-perfil/editar")
+public String editarMiPerfil(Model model) {
+Usuario usuarioActual = getUsuarioAutenticado();
+
+if (usuarioActual == null) {
+return "redirect:/login";
+}
+
+model.addAttribute("usuario", usuarioActual);
+return "editar-mi-perfil";
+}
+
+@PostMapping("/mi-perfil/editar")
+public String guardarMiPerfil(@RequestParam String nombre,
+@RequestParam Double nivelExperiencia) {
+Usuario usuarioActual = getUsuarioAutenticado();
+
+if (usuarioActual == null) {
+return "redirect:/login";
+}
+
+usuarioActual.setNombre(nombre);
+usuarioActual.setNivelExperiencia(new Nivel(nivelExperiencia));
+
+usuarioRepository.save(usuarioActual);
+
+return "redirect:/mi-perfil";
+}
+}

@@ -163,7 +163,7 @@ model.addAttribute("nombreSeguido", usuarioPerfil.getNombre());
 model.addAttribute("mensajeExito", "Ahora sigues a este usuario.");
 model.addAttribute("emailUsuario", usuarioPerfil.getEmail().getDireccion());
 
-return "seguir-exito";
+return "seguido-confirmacion";
 }
 
 @PostMapping("/usuarios/{email}/dejar-seguir")

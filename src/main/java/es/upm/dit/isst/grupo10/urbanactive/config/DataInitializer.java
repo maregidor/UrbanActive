@@ -57,6 +57,8 @@ public class DataInitializer implements CommandLineRunner {
 
         // 3. USUARIO (Participante)
         Usuario juan = usuarioRepository.save(new Usuario(new Email("usuario1@gmail.com"), "Juan Pérez", new Nivel(5.0), passwordEncoder.encode("1234"), null, null));
+        Usuario maria = usuarioRepository.save(new Usuario(new Email("usuario2@gmail.com"), "María García", new Nivel(4.5), passwordEncoder.encode("1234"), null, null));
+
 
         // 4. SEIS ACTIVIDADES DISTINTAS
 
@@ -96,10 +98,10 @@ public class DataInitializer implements CommandLineRunner {
             madridActivo, madridRio, 40.4045, -3.7170, 40, 
             "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e"));
 
-        // Actividad 7: Running con Juan (Usuario creador, Retiro)
-        actividadRepository.save(crearActividadUsuario("Running con Juan", "Cardio", 0.0, 4.0,
+        // Actividad 7: Running con María (Usuario creador, Retiro)
+        actividadRepository.save(crearActividadUsuario("Running con María", "Cardio", 0.0, 4.0,
             LocalDate.now().plusDays(6), LocalTime.of(9, 30),
-            juan, retiro, 40.4153, -3.6839, 20,
+            maria, retiro, 40.4153, -3.6839, 20,
             "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8"));    
 
         System.out.println("¡Datos cargados con éxito! Se han creado 7 actividades y 3 organizaciones.");

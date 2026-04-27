@@ -55,9 +55,10 @@
           </th:block>
 
           <th:block th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}">
-            <a th:href="@{/usuarios/{email}(email=${actividad.usuarioOrganizador.email.direccion})}"
-               class="fw-bold text-decoration-none text-primary">
-              <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
+            <a th:if="${actividad.organizacion == null and actividad.usuarioOrganizador != null}"
+              th:href="@{/usuarios/{slug}(slug=${actividad.usuarioOrganizador.slug})}"
+              class="fw-bold text-decoration-none text-primary">
+                <span th:text="${actividad.usuarioOrganizador.nombre}">Usuario</span>
             </a>
           </th:block>
 

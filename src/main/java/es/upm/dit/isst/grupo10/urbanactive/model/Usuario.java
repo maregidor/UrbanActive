@@ -43,6 +43,13 @@ public class Usuario {
         )
         private List<Reserva> reservas = new ArrayList<>();
 
+        @Column(unique = true, nullable = false)
+        private String slug;
+
+
+
+
+
         public Usuario() {
         }
 
@@ -110,6 +117,38 @@ public class Usuario {
                         siguiendo.remove(usuario);
                         usuario.getSeguidores().remove(this);
                 }
+        }
+
+        @PrePersist
+        @PreUpdate
+        private void generarSlugSiHaceFalta() {
+        if ((slug == null || slug.isBlank()) && nombre != null && !nombre.isBlank()) {
+                String base = slugify(nombre);
+                String random = java.util.UUID.randomUUID().toString().substring(0, 6);
+                this.slug = base + "-" + random;
+        }
+        }
+
+        private String slugify(String texto) {
+        return texto.toLowerCase()
+                .trim()
+                .replace("á", "a")
+                .replace("é", "e")
+                .replace("í", "i")
+                .replace("ó", "o")
+                .replace("ú", "u")
+                .replace("ñ", "n")
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .replaceAll("-+", "-");
+        }
+
+        public String getSlug() {
+        return slug;
+        }
+
+        public void setSlug(String slug) {
+        this.slug = slug;
         }
 
 }

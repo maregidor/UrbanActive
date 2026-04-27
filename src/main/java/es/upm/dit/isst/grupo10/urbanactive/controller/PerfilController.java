@@ -39,9 +39,9 @@ this.seguimientoOrganizacionRepository = seguimientoOrganizacionRepository;
 this.seguimientoUsuarioRepository = seguimientoUsuarioRepository;
 }
 
-@GetMapping("/usuarios/{email}")
-public String verPerfilUsuario(@PathVariable String email, Model model) {
-Optional<Usuario> usuarioOpt = usuarioRepository.findById(new Email(email));
+@GetMapping("/usuarios/{slug}")
+public String verPerfilUsuario(@PathVariable String slug, Model model) {
+Optional<Usuario> usuarioOpt = usuarioRepository.findBySlug(slug);
 
 if (usuarioOpt.isEmpty()) {
 return "redirect:/actividades";
@@ -136,9 +136,9 @@ seguimientoOrganizacionRepository
 return "redirect:/organizaciones/" + slug;
 }
 
-@PostMapping("/usuarios/{email}/seguir")
-public String seguirUsuario(@PathVariable String email, Model model) {
-Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+@PostMapping("/usuarios/{slug}/seguir")
+public String seguirUsuario(@PathVariable String slug, Model model) {
+Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
 Usuario usuarioActual = getUsuarioAutenticado();
 
 if (usuarioPerfilOpt.isEmpty() || usuarioActual == null) {
@@ -157,14 +157,14 @@ seguimientoUsuarioRepository
 
 model.addAttribute("nombreSeguido", usuarioPerfil.getNombre());
 model.addAttribute("mensajeExito", "Ahora sigues a este usuario.");
-model.addAttribute("emailUsuario", usuarioPerfil.getEmail().getDireccion());
+model.addAttribute("slugUsuario", usuarioPerfil.getSlug());
 
 return "seguido-confirmacion";
 }
 
-@PostMapping("/usuarios/{email}/dejar-seguir")
-public String dejarSeguirUsuario(@PathVariable String email) {
-Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+@PostMapping("/usuarios/{slug}/dejar-seguir")
+public String dejarSeguirUsuario(@PathVariable String slug) {
+Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
 Usuario usuarioActual = getUsuarioAutenticado();
 
 if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
@@ -173,7 +173,7 @@ seguimientoUsuarioRepository
 .ifPresent(seguimientoUsuarioRepository::delete);
 }
 
-return "redirect:/usuarios/" + email;
+return "redirect:/usuarios/" + slug;
 }
 
 private Usuario getUsuarioAutenticado() {

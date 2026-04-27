@@ -237,11 +237,11 @@ Al seguir a este usuario, podrás ver sus actividades en tu página "Mis seguido
 </p>
 <p>Recuerda que al seguir a un usario, este podrá verte en su lista de seguidores.</p>
 
-<a th:if="${emailUsuario != null}"
-th:href="@{/usuarios/{email}(email=${emailUsuario})}"
-class="btn-soft">
-<i class="fa-solid fa-arrow-left"></i>
-Volver al perfil
+<a th:if="${slugUsuario != null}"
+   th:href="@{/usuarios/{slug}(slug=${slugUsuario})}"
+   class="btn-soft">
+    <i class="fa-solid fa-arrow-left"></i>
+    Volver al perfil
 </a>
 
 <a th:if="${slugOrganizacion != null}"

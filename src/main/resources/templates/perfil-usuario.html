@@ -39,8 +39,8 @@
 
                 <div>
                     <h3 class="mb-1 fw-bold" th:text="${perfil.nombre}">Nombre Usuario</h3>
-                    <small class="opacity-75" th:text="${perfil.email != null ? perfil.email.direccion : 'usuario@email.com'}">
-                        usuario@email.com
+                    <small class="opacity-75">
+                        Usuario
                     </small>
                 </div>
 
@@ -53,14 +53,14 @@
                 </div>
 
                <form th:if="${!esMiPerfil and !yaLeSigue}" method="post"
-                    th:action="@{/usuarios/{email}/seguir(email=${perfil.email.direccion})}">
+                    th:action="@{/usuarios/{slug}/seguir(slug=${perfil.slug})}">
                     <button class="btn btn-light btn-follow fw-semibold" type="submit">
                         Seguir
                     </button>
                 </form>
 
                 <form th:if="${!esMiPerfil and yaLeSigue}" method="post"
-                      th:action="@{/usuarios/{email}/dejar-seguir(email=${perfil.email.direccion})}">
+                      th:action="@{/usuarios/{slug}/dejar-seguir(slug=${perfil.slug})}">
                     <button class="btn btn-outline-light btn-follow fw-semibold" type="submit">
                         Dejar de seguir
                     </button>

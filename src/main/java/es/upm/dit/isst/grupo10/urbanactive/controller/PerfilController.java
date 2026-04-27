@@ -1,5 +1,6 @@
 package es.upm.dit.isst.grupo10.urbanactive.controller;
 
+import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoOrganizacion;
@@ -15,7 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Controller
@@ -99,10 +102,11 @@ return "perfil-organizacion";
 @PostMapping("/organizaciones/{slug}/seguir")
 public String seguirOrganizacion(@PathVariable String slug, Model model) {
 Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
+
 Usuario usuarioActual = getUsuarioAutenticado();
 
 if (organizacionOpt.isEmpty() || usuarioActual == null) {
-return "redirect:/actividades";
+return "redirect:/login";
 }
 
 Organizacion organizacion = organizacionOpt.get();
@@ -142,7 +146,7 @@ Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
 Usuario usuarioActual = getUsuarioAutenticado();
 
 if (usuarioPerfilOpt.isEmpty() || usuarioActual == null) {
-return "redirect:/actividades";
+return "redirect:/login";
 }
 
 Usuario usuarioPerfil = usuarioPerfilOpt.get();
@@ -185,4 +189,41 @@ return null;
 
 return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
 }
-}
+
+@GetMapping("/mis-seguidos")
+public String verMisSeguidos(Model model) {
+    Usuario usuarioActual = getUsuarioAutenticado();
+    if (usuarioActual == null) {
+        return "redirect:/login";
+    }
+
+    List<Usuario> usuariosSeguidos = seguimientoUsuarioRepository
+        .findBySeguidor(usuarioActual)
+        .stream()
+        .map(SeguimientoUsuario::getSeguido)
+        .toList();
+
+    List<Organizacion> organizacionesSeguidas = seguimientoOrganizacionRepository
+        .findBySeguidor(usuarioActual)
+        .stream()
+        .map(SeguimientoOrganizacion::getOrganizacion)
+        .toList();
+
+    List<Actividad> actividadesUsuarios = usuariosSeguidos.isEmpty()
+    ? List.of()
+    : actividadRepository.findByUsuarioOrganizadorIn(usuariosSeguidos);
+
+    List<Actividad> actividadesOrganizaciones = organizacionesSeguidas.isEmpty()
+    ? List.of()
+: actividadRepository.findByOrganizacionIn(organizacionesSeguidas);
+
+List<Actividad> actividades = new ArrayList<>();
+actividades.addAll(actividadesUsuarios);
+actividades.addAll(actividadesOrganizaciones);
+
+model.addAttribute("usuariosSeguidos", usuariosSeguidos);
+model.addAttribute("organizacionesSeguidas", organizacionesSeguidas);
+model.addAttribute("actividades", actividades);
+
+return "mis-seguidos";
+}}

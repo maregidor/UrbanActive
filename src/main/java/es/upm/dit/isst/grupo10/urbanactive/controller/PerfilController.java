@@ -18,8 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -229,16 +227,34 @@ model.addAttribute("actividades", actividades);
 
 return "mis-seguidos";
 }
+
 @GetMapping("/mi-perfil")
 public String verMiPerfil(Model model) {
-Usuario usuarioActual = getUsuarioAutenticado();
+    Usuario usuarioActual = getUsuarioAutenticado();
 
-if (usuarioActual == null) {
-return "redirect:/login";
-}
+    if (usuarioActual == null) {
+        return "redirect:/login";
+    }
 
-model.addAttribute("usuario", usuarioActual);
-return "mi-perfil";
+    List<Usuario> seguidores = seguimientoUsuarioRepository
+            .findBySeguido(usuarioActual)
+            .stream()
+            .map(SeguimientoUsuario::getSeguidor)
+            .toList();
+
+    List<Usuario> seguidos = seguimientoUsuarioRepository
+            .findBySeguidor(usuarioActual)
+            .stream()
+            .map(SeguimientoUsuario::getSeguido)
+            .toList();
+
+    model.addAttribute("usuario", usuarioActual);
+    model.addAttribute("seguidores", seguidores);
+    model.addAttribute("seguidos", seguidos);
+    model.addAttribute("numSeguidores", seguidores.size());
+    model.addAttribute("numSeguidos", seguidos.size());
+
+    return "mi-perfil";
 }
 
 @GetMapping("/mi-perfil/editar")

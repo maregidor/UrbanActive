@@ -25,11 +25,11 @@ import java.util.Optional;
 @Controller
 public class PerfilController {
 
-    private final ActividadRepository actividadRepository;
-    private final OrganizacionRepository organizacionRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final SeguimientoOrganizacionRepository seguimientoOrganizacionRepository;
-    private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
+private final ActividadRepository actividadRepository;
+private final OrganizacionRepository organizacionRepository;
+private final UsuarioRepository usuarioRepository;
+private final SeguimientoOrganizacionRepository seguimientoOrganizacionRepository;
+private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
 
     public PerfilController(ActividadRepository actividadRepository,
                             OrganizacionRepository organizacionRepository,

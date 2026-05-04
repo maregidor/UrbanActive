@@ -1,7 +1,7 @@
 package es.upm.dit.isst.grupo10.urbanactive.controller;
 
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
-import es.upm.dit.isst.grupo10.urbanactive.model.Identificacion;
+import es.upm.dit.isst.grupo10.urbanactive.model.Nivel;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoOrganizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoUsuario;
@@ -18,7 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class PerfilController {
@@ -40,6 +42,70 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         this.seguimientoOrganizacionRepository = seguimientoOrganizacionRepository;
         this.seguimientoUsuarioRepository = seguimientoUsuarioRepository;
     }
+
+    // PERFIL USUARIO LOGUEADO
+
+    @GetMapping("/mi-perfil")
+    public String verMiPerfil(Model model) {
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        List<Usuario> seguidores = seguimientoUsuarioRepository.findBySeguido(usuario)
+                .stream()
+                .map(SeguimientoUsuario::getSeguidor)
+                .collect(Collectors.toList());
+
+        List<Usuario> seguidos = seguimientoUsuarioRepository.findBySeguidor(usuario)
+                .stream()
+                .map(SeguimientoUsuario::getSeguido)
+                .collect(Collectors.toList());
+
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("seguidores", seguidores);
+        model.addAttribute("seguidos", seguidos);
+        model.addAttribute("numSeguidores", seguidores.size());
+        model.addAttribute("numSeguidos", seguidos.size());
+
+        return "mi-perfil";
+    }
+
+    @GetMapping("/mi-perfil/editar")
+    public String mostrarEditarMiPerfil(Model model) {
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("usuario", usuario);
+        return "editar-mi-perfil";
+    }
+
+    @PostMapping("/mi-perfil/editar")
+    public String guardarEditarMiPerfil(@RequestParam String nombre,
+                                        @RequestParam double nivelExperiencia) {
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        usuario.setNombre(nombre);
+
+        Nivel nivel = new Nivel();
+        nivel.setValor(nivelExperiencia);
+        usuario.setNivelExperiencia(nivel);
+
+        usuarioRepository.save(usuario);
+
+        return "redirect:/mi-perfil";
+    }
+
+
+    // PERFIL DE OTRO USUARIO
 
     @GetMapping("/usuarios/{slug}")
     public String verPerfilUsuario(@PathVariable String slug,
@@ -72,6 +138,57 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
 
         return "perfil-usuario";
     }
+
+    @PostMapping("/usuarios/{slug}/seguir")
+    public String seguirUsuario(@PathVariable String slug) {
+        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
+        Usuario usuarioActual = getUsuarioAutenticado();
+
+        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
+            Usuario usuarioPerfil = usuarioPerfilOpt.get();
+            boolean esMiPerfil = usuarioActual.getEmail().equals(usuarioPerfil.getEmail());
+            boolean yaExiste = seguimientoUsuarioRepository
+                    .existsBySeguidorAndSeguido(usuarioActual, usuarioPerfil);
+
+            if (!esMiPerfil && !yaExiste) {
+                seguimientoUsuarioRepository
+                        .save(new SeguimientoUsuario(usuarioActual, usuarioPerfil));
+            }
+        }
+
+        return "redirect:/usuarios/" + slug;
+    }
+
+    @PostMapping("/usuarios/{slug}/dejar-seguir")
+    public String dejarSeguirUsuario(@PathVariable String slug) {
+        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
+        Usuario usuarioActual = getUsuarioAutenticado();
+
+        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
+            seguimientoUsuarioRepository
+                    .findBySeguidorAndSeguido(usuarioActual, usuarioPerfilOpt.get())
+                    .ifPresent(seguimientoUsuarioRepository::delete);
+        }
+
+        return "redirect:/usuarios/" + slug;
+    }
+
+    @GetMapping("/perfil/usuario")
+    public String perfilUsuario(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        model.addAttribute("usuario", usuario);
+        return "perfil-usuario";
+    }
+
+    @PostMapping("/perfil/usuario")
+    public String actualizarUsuario(Usuario usuario, HttpSession session) {
+        usuarioRepository.save(usuario);
+        session.setAttribute("usuarioLogueado", usuario);
+        return "redirect:/perfil/usuario";
+    }
+
+    
+    // PERFIL ORGANIZACION
 
     @GetMapping("/organizaciones/{slug}")
     public String verPerfilOrganizacion(@PathVariable String slug,
@@ -136,65 +253,6 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         return "redirect:/organizaciones/" + slug;
     }
 
-    @PostMapping("/usuarios/{slug}/seguir")
-    public String seguirUsuario(@PathVariable String slug) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
-        Usuario usuarioActual = getUsuarioAutenticado();
-
-        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
-            Usuario usuarioPerfil = usuarioPerfilOpt.get();
-            boolean esMiPerfil = usuarioActual.getEmail().equals(usuarioPerfil.getEmail());
-            boolean yaExiste = seguimientoUsuarioRepository
-                    .existsBySeguidorAndSeguido(usuarioActual, usuarioPerfil);
-
-            if (!esMiPerfil && !yaExiste) {
-                seguimientoUsuarioRepository
-                        .save(new SeguimientoUsuario(usuarioActual, usuarioPerfil));
-            }
-        }
-
-        return "redirect:/usuarios/" + slug;
-    }
-
-    @PostMapping("/usuarios/{slug}/dejar-seguir")
-    public String dejarSeguirUsuario(@PathVariable String slug) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
-        Usuario usuarioActual = getUsuarioAutenticado();
-
-        if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
-            seguimientoUsuarioRepository
-                    .findBySeguidorAndSeguido(usuarioActual, usuarioPerfilOpt.get())
-                    .ifPresent(seguimientoUsuarioRepository::delete);
-        }
-
-        return "redirect:/usuarios/" + slug;
-    }
-
-    private Usuario getUsuarioAutenticado() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
-            return null;
-        }
-
-        return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
-    }
-
-
-    @GetMapping("/perfil/usuario")
-    public String perfilUsuario(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
-        return "perfil-usuario";
-    }
-
-    @PostMapping("/perfil/usuario")
-    public String actualizarUsuario(Usuario usuario, HttpSession session) {
-        usuarioRepository.save(usuario);
-        session.setAttribute("usuarioLogueado", usuario);
-        return "redirect:/perfil/usuario";
-    }
-
     @GetMapping("/perfil/organizacion")
     public String perfilOrganizacion(HttpSession session, Model model) {
         Organizacion org = (Organizacion) session.getAttribute("organizacionLogueada");
@@ -207,5 +265,18 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         organizacionRepository.save(org);
         session.setAttribute("organizacionLogueada", org);
         return "redirect:/perfil/organizacion";
+    }
+
+
+    // MÉTODO AUXILIAR
+    
+    private Usuario getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+            return null;
+        }
+
+        return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
     }
 }

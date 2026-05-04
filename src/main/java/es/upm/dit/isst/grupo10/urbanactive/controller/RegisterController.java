@@ -106,7 +106,7 @@ public class RegisterController {
 
         // ⚠️ IMPORTANTE: inicializar embebidos si existen
             org.setValoracion(new Valoracion());
-            org.setIdentificacion(new Identificacion());
+            
 
             organizacionRepository.save(org);
             System.out.println("Organización guardada con ID: " + org.getEmail() + " y contraseña encriptada: " + org.getPassword());

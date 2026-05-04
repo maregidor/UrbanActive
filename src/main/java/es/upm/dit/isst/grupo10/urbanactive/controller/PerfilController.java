@@ -17,8 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Optional;
 
@@ -43,10 +41,10 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         this.seguimientoUsuarioRepository = seguimientoUsuarioRepository;
     }
 
-    @GetMapping("/usuarios/{email}")
-    public String verPerfilUsuario(@PathVariable String email,
+    @GetMapping("/usuarios/{slug}")
+    public String verPerfilUsuario(@PathVariable String slug,
                                    Model model) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(new Email(email));
+        Optional<Usuario> usuarioOpt = usuarioRepository.findBySlug(slug);
 
         if (usuarioOpt.isEmpty()) {
             return "redirect:/actividades";
@@ -75,12 +73,10 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         return "perfil-usuario";
     }
 
-    @GetMapping("/organizaciones/{tipo}/{numero}")
-    public String verPerfilOrganizacion(@PathVariable String tipo,
-                                        @PathVariable String numero,
+    @GetMapping("/organizaciones/{slug}")
+    public String verPerfilOrganizacion(@PathVariable String slug,
                                         Model model) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
+        Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
 
         if (organizacionOpt.isEmpty()) {
             return "redirect:/actividades";
@@ -106,11 +102,9 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         return "perfil-organizacion";
     }
 
-    @PostMapping("/organizaciones/{tipo}/{numero}/seguir")
-    public String seguirOrganizacion(@PathVariable String tipo,
-                                     @PathVariable String numero) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
+    @PostMapping("/organizaciones/{slug}/seguir")
+    public String seguirOrganizacion(@PathVariable String slug) {
+        Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
         Usuario usuarioActual = getUsuarioAutenticado();
 
         if (organizacionOpt.isPresent() && usuarioActual != null) {
@@ -125,14 +119,12 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
             }
         }
 
-        return "redirect:/organizaciones/" + tipo + "/" + numero;
+        return "redirect:/organizaciones/" + slug;
     }
 
-    @PostMapping("/organizaciones/{tipo}/{numero}/dejar-seguir")
-    public String dejarSeguirOrganizacion(@PathVariable String tipo,
-                                          @PathVariable String numero) {
-        Identificacion id = new Identificacion(tipo, numero);
-        Optional<Organizacion> organizacionOpt = organizacionRepository.findById(id);
+    @PostMapping("/organizaciones/{slug}/dejar-seguir")
+    public String dejarSeguirOrganizacion(@PathVariable String slug) {
+        Optional<Organizacion> organizacionOpt = organizacionRepository.findBySlug(slug);
         Usuario usuarioActual = getUsuarioAutenticado();
 
         if (organizacionOpt.isPresent() && usuarioActual != null) {
@@ -141,12 +133,12 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
                     .ifPresent(seguimientoOrganizacionRepository::delete);
         }
 
-        return "redirect:/organizaciones/" + tipo + "/" + numero;
+        return "redirect:/organizaciones/" + slug;
     }
 
-    @PostMapping("/usuarios/{email}/seguir")
-    public String seguirUsuario(@PathVariable String email) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+    @PostMapping("/usuarios/{slug}/seguir")
+    public String seguirUsuario(@PathVariable String slug) {
+        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
         Usuario usuarioActual = getUsuarioAutenticado();
 
         if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
@@ -161,12 +153,12 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
             }
         }
 
-        return "redirect:/usuarios/" + email;
+        return "redirect:/usuarios/" + slug;
     }
 
-    @PostMapping("/usuarios/{email}/dejar-seguir")
-    public String dejarSeguirUsuario(@PathVariable String email) {
-        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findById(new Email(email));
+    @PostMapping("/usuarios/{slug}/dejar-seguir")
+    public String dejarSeguirUsuario(@PathVariable String slug) {
+        Optional<Usuario> usuarioPerfilOpt = usuarioRepository.findBySlug(slug);
         Usuario usuarioActual = getUsuarioAutenticado();
 
         if (usuarioPerfilOpt.isPresent() && usuarioActual != null) {
@@ -175,7 +167,7 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
                     .ifPresent(seguimientoUsuarioRepository::delete);
         }
 
-        return "redirect:/usuarios/" + email;
+        return "redirect:/usuarios/" + slug;
     }
 
     private Usuario getUsuarioAutenticado() {

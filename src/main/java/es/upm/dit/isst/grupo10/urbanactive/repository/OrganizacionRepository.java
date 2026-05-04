@@ -15,10 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface OrganizacionRepository extends JpaRepository <Organizacion, Identificacion> {
+    
     Optional<Organizacion> findByIdentificacionNumero(String numero);
 
+    Optional<Organizacion> findByEmailDireccion(String direccion);
 
-    Optional<Organizacion> findByEmailDireccion(Email email);
+    Optional<Organizacion> findBySlug(String slug);
     
 
 }

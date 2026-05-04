@@ -42,7 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // 🔍 2. Buscar organización
-        Optional<Organizacion> orgOpt = organizacionRepository.findByEmailDireccion(email);
+        Optional<Organizacion> orgOpt = organizacionRepository.findByEmailDireccion(username);
         if (orgOpt.isPresent()) {
             Organizacion org = orgOpt.get();
 

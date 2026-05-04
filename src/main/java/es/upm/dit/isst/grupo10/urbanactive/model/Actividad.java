@@ -37,7 +37,10 @@ public class Actividad {
     private Usuario usuarioOrganizador;
 
     @ManyToOne
-    @JoinColumn(name = "organizacion_email")
+    @JoinColumns({
+        @JoinColumn(name = "organizacion_tipo", referencedColumnName = "tipo"),
+        @JoinColumn(name = "organizacion_numero", referencedColumnName = "numero")
+    })
     private Organizacion organizacion;
 
     @ManyToOne

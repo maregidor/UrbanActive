@@ -6,10 +6,11 @@ import jakarta.persistence.*;
 @Table(name = "organizaciones")
 public class Organizacion {
     
-    @Embedded
+    @EmbeddedId
     private Identificacion identificacion;
 
-    @Id
+    @Embedded
+    @Column(unique = true, nullable = false)
     private Email email;
     private String nombre;
     private String password;
@@ -17,8 +18,8 @@ public class Organizacion {
     private String actividad;
     private Valoracion valoracion;
 
-@Column(unique = true, nullable = false)
-private String slug;
+    @Column(unique = true, nullable = false)
+    private String slug;
 
 
     public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion, Email email, String password, String cif, String actividad) {

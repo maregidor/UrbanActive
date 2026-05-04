@@ -12,12 +12,13 @@ public class Organizacion {
     @Embedded
     @Column(unique = true, nullable = false)
     private Email email;
-    
+
     private String nombre;
     private String password;
-    @Id
     private String cif;
     private String actividad;
+
+    @Embedded
     private Valoracion valoracion;
 
     @Column(unique = true, nullable = false)
@@ -34,35 +35,35 @@ public class Organizacion {
         this.actividad = actividad;
     }
 
-public Organizacion() {}
+    public Organizacion() {}
 
 
-@PrePersist
-@PreUpdate
-private void generarSlugSiHaceFalta() {
-if (nombre != null && !nombre.isBlank()) {
-this.slug = slugify(nombre);
-}
-}
+    @PrePersist
+    @PreUpdate
+    private void generarSlugSiHaceFalta() {
+    if (nombre != null && !nombre.isBlank()) {
+    this.slug = slugify(nombre);
+    }
+    }
 
-private String slugify(String texto) {
-return texto.toLowerCase()
-.trim()
-.replace("á", "a")
-.replace("é", "e")
-.replace("í", "i")
-.replace("ó", "o")
-.replace("ú", "u")
-.replace("ñ", "n")
-.replaceAll("[^a-z0-9\\s-]", "")
-.replaceAll("\\s+", "-")
-.replaceAll("-+", "-");
-}
+    private String slugify(String texto) {
+    return texto.toLowerCase()
+    .trim()
+    .replace("á", "a")
+    .replace("é", "e")
+    .replace("í", "i")
+    .replace("ó", "o")
+    .replace("ú", "u")
+    .replace("ñ", "n")
+    .replaceAll("[^a-z0-9\\s-]", "")
+    .replaceAll("\\s+", "-")
+    .replaceAll("-+", "-");
+    }
 
 
-public String getNombre() {
-return nombre;
-}
+    public String getNombre() {
+    return nombre;
+    }
 
     public Valoracion getValoracion() {
         return valoracion;
@@ -105,6 +106,14 @@ return nombre;
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public Identificacion getIdentificacion() {
+        return identificacion;
+    }
+    
+    public void setIdentificacion(Identificacion identificacion) {
+        this.identificacion = identificacion;
     }
     
 }

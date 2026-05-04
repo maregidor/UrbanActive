@@ -12,8 +12,10 @@ public class Organizacion {
     @Embedded
     @Column(unique = true, nullable = false)
     private Email email;
+    
     private String nombre;
     private String password;
+    @Id
     private String cif;
     private String actividad;
     private Valoracion valoracion;
@@ -22,8 +24,8 @@ public class Organizacion {
     private String slug;
 
 
-    public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion, Email email, String password, String cif, String actividad) {
-        this.identificacion = identificacion;
+    public Organizacion( String nombre, Valoracion valoracion, Email email, String password, String cif, String actividad) {
+        
         this.nombre = nombre;
         this.valoracion = valoracion;
         this.email = email;
@@ -34,11 +36,6 @@ public class Organizacion {
 
 public Organizacion() {}
 
-public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion) {
-this.identificacion = identificacion;
-this.nombre = nombre;
-this.valoracion = valoracion;
-}
 
 @PrePersist
 @PreUpdate
@@ -62,9 +59,6 @@ return texto.toLowerCase()
 .replaceAll("-+", "-");
 }
 
-public Identificacion getIdentificacion() {
-return identificacion;
-}
 
 public String getNombre() {
 return nombre;
@@ -108,9 +102,7 @@ return nombre;
     public void setSlug(String slug) {
         this.slug = slug;
     }
-    public void setIdentificacion(Identificacion identificacion) {
-        this.identificacion = identificacion;
-    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }

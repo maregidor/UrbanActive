@@ -100,6 +100,20 @@ return nombre;
     public void setActividad(String actividad) {
         this.actividad = actividad;
     }
+
+    public String getSlug() {
+        return slug;
+    }
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+    public void setIdentificacion(Identificacion identificacion) {
+        this.identificacion = identificacion;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
 }
 
 

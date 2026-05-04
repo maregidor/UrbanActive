@@ -35,7 +35,8 @@ public class DataInitializer implements CommandLineRunner {
                 nivelInicial,
                 passwordEncriptada, // Guardamos el hash, no el texto plano
                 new ArrayList<>(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                "correr "
             );
 
             usuarioRepository.save(usuarioPrueba);

@@ -53,7 +53,7 @@ public class Actividad {
         joinColumns = @JoinColumn(name="actividad_id"),
         inverseJoinColumns = @JoinColumn(name="reserva_id")
     )
-    private List <Reserva> reservas = new ArrayList<>();
+    private List<Reserva> reservas = new ArrayList<>();
 
     private Double latitud;
     private Double longitud;
@@ -66,6 +66,7 @@ public class Actividad {
         if (this.usuarioOrganizador != null) return usuarioOrganizador.getNombre();
         return "Sin organizador";
     }
+
 
     public List<Usuario> getParticipantes() {
         List<Usuario> participantes = new ArrayList<>();
@@ -118,4 +119,5 @@ public class Actividad {
     public void setReservas(List<Reserva> reservas) { this.reservas = reservas; }
     public void setLatitud(Double latitud) { this.latitud = latitud; }
     public void setLongitud(Double longitud) { this.longitud = longitud; }
+
 }

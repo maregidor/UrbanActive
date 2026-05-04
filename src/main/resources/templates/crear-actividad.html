@@ -11,6 +11,8 @@
     <style>
         #map { height: 300px; width: 100%; z-index: 1; }
         .search-select-container { max-height: 200px; overflow-y: auto; }
+        .image-option-card { border: 2px dashed #dee2e6; transition: all 0.3s ease; }
+        .image-option-card:hover { border-color: #0d6efd; background-color: #f8f9fa; }
     </style>
 </head>
 
@@ -37,7 +39,7 @@
                         <p class="text-muted">Completa los detalles para publicar tu sesión deportiva.</p>
                     </div>
 
-                    <form th:action="@{/actividades/guardar}" th:object="${actividad}" method="post">
+                    <form th:action="@{/actividades/guardar}" th:object="${actividad}" method="post" enctype="multipart/form-data">
                         
                         <div class="row">
                             <div class="col-md-12 mb-3">
@@ -109,6 +111,28 @@
                                           rows="4" placeholder="¿En qué consiste la actividad? ¿Qué deben traer?" maxlength="150"></textarea>
                             </div>
 
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold">Imagen de la actividad</label>
+                                <div class="card image-option-card rounded-3 p-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Subir desde el equipo</label>
+                                            <input type="file" name="imagenArchivo" class="form-control" accept="image/*">
+                                        </div>
+                                        <div class="col-md-2 text-center text-muted fw-bold">
+                                            O
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Proporcionar enlace URL</label>
+                                            <input type="url" th:field="*{imagen}" class="form-control" placeholder="https://ejemplo.com/foto.jpg">
+                                        </div>
+                                    </div>
+                                    <div class="form-text mt-3">
+                                        <i class="fas fa-info-circle me-1"></i> Se recomienda subir una imagen con formato horizontal (16:9). Si se proporcionan ambas opciones, el archivo subido tendrá prioridad.
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold">Fecha</label>
                                 <input type="date" th:field="*{fecha}" class="form-control rounded-3" required>
@@ -140,11 +164,6 @@
                                 <label class="form-label fw-semibold">Plazas totales</label>
                                 <input type="number" th:field="*{plazasTotales}" class="form-control rounded-3" min="1" required>
                             </div>
-
-                            <div class="col-md-12 mb-4">
-                                <label class="form-label fw-semibold">URL de la imagen</label>
-                                <input type="url" th:field="*{imagen}" class="form-control rounded-3" placeholder="https://...">
-                            </div>
                         </div>
 
                         <hr class="my-4">
@@ -162,7 +181,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script th:inline="javascript">
-        // 1. Inicializar Mapa (Madrid por defecto)
         const map = L.map('map').setView([40.4168, -3.7038], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
@@ -174,7 +192,6 @@
         const latInput = document.getElementById('latitud');
         const lonInput = document.getElementById('longitud');
 
-        // 2. Buscador / Filtrado del Select
         const originalOptions = Array.from(espacioSelect.options);
         searchInput.addEventListener('input', (e) => {
             const filter = e.target.value.toLowerCase();
@@ -186,17 +203,13 @@
             });
         });
 
-        // 3. Selección de Espacio Verificado
         espacioSelect.addEventListener('change', (e) => {
             const selectedOption = e.target.options[e.target.selectedIndex];
             if (selectedOption.value !== "") {
                 const lat = selectedOption.getAttribute('data-lat');
                 const lon = selectedOption.getAttribute('data-lon');
-                
-                // Limpiar coordenadas manuales si elige un espacio verificado
                 latInput.value = '';
                 lonInput.value = '';
-                
                 if (lat && lon) {
                     updateMarker(lat, lon, "Ubicación del espacio verificado");
                     map.setView([lat, lon], 16);
@@ -204,17 +217,12 @@
             }
         });
 
-        // 4. Selección Manual en el Mapa
         map.on('click', (e) => {
             const lat = e.latlng.lat.toFixed(6);
             const lon = e.latlng.lng.toFixed(6);
-
-            // Anular selección de espacio verificado si hace clic en el mapa
             espacioSelect.value = "";
-            
             latInput.value = lat;
             lonInput.value = lon;
-
             updateMarker(lat, lon, "Ubicación personalizada fijada");
             document.getElementById('coordsHelp').innerHTML = `<i class="fas fa-check me-1"></i> Punto fijado: ${lat}, ${lon}`;
         });

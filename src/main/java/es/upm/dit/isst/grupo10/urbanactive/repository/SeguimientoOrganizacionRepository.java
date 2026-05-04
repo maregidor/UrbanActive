@@ -4,21 +4,31 @@ import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoOrganizacion;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SeguimientoOrganizacionRepository extends JpaRepository<SeguimientoOrganizacion, Long> {
 
-    boolean existsBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);                             // Verificación de existencia de un seguimiento
+    boolean existsBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);
 
-    Optional<SeguimientoOrganizacion> findBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);     // Búsqueda de un seguimiento por su usuario seguidor y organización seguida
+    Optional<SeguimientoOrganizacion> findBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);
 
-    void deleteBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);                                // Borrado de un seguimiento
+    void deleteBySeguidorAndOrganizacion(Usuario seguidor, Organizacion organizacion);
 
-    long countByOrganizacion(Organizacion organizacion);                                                              // Conteo de seguidores de una organización
+    long countByOrganizacion(Organizacion organizacion);
 
-    List<SeguimientoOrganizacion> findBySeguidor(Usuario seguidor);                                                   // Listado de seguimientos realizados por un usuario   
+    @Query("""
+        select s
+        from SeguimientoOrganizacion s
+        join fetch s.organizacion
+        where s.seguidor = :seguidor
+    """)
+    List<SeguimientoOrganizacion> findBySeguidorConOrganizacion(@Param("seguidor") Usuario seguidor);
 
-    List<SeguimientoOrganizacion> findByOrganizacion(Organizacion organizacion);                                      // Listado de seguimientos recibidos por una organización   
+    List<SeguimientoOrganizacion> findBySeguidor(Usuario seguidor);
+
+    List<SeguimientoOrganizacion> findByOrganizacion(Organizacion organizacion);
 }

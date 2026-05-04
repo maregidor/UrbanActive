@@ -3,23 +3,41 @@ package es.upm.dit.isst.grupo10.urbanactive.repository;
 import es.upm.dit.isst.grupo10.urbanactive.model.SeguimientoUsuario;
 import es.upm.dit.isst.grupo10.urbanactive.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SeguimientoUsuarioRepository extends JpaRepository<SeguimientoUsuario, Long> {
 
-    boolean existsBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);                           // Verificación de existencia de un seguimiento
+    boolean existsBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);
 
-    Optional<SeguimientoUsuario> findBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);        // Búsqueda de un seguimiento por sus dos usuarios
+    Optional<SeguimientoUsuario> findBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);
 
-    void deleteBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);                              // Borrado de un seguimiento
+    void deleteBySeguidorAndSeguido(Usuario seguidor, Usuario seguido);
 
-    long countBySeguido(Usuario seguido);                                                            // Conteo de seguidores de un usuario
+    long countBySeguido(Usuario seguido);
 
-    long countBySeguidor(Usuario seguidor);                                                          // Conteo de usuarios seguidos
+    long countBySeguidor(Usuario seguidor);
 
-    List<SeguimientoUsuario> findBySeguidor(Usuario seguidor);                                       // Listado de seguimientos realizados por un usuario
+    @Query("""
+        select s
+        from SeguimientoUsuario s
+        join fetch s.seguido
+        where s.seguidor = :seguidor
+    """)
+    List<SeguimientoUsuario> findBySeguidorConSeguido(@Param("seguidor") Usuario seguidor);
 
-    List<SeguimientoUsuario> findBySeguido(Usuario seguido);                                         // Listado de seguimientos recibidos por un usuario
+    @Query("""
+        select s
+        from SeguimientoUsuario s
+        join fetch s.seguidor
+        where s.seguido = :seguido
+    """)
+    List<SeguimientoUsuario> findBySeguidoConSeguidor(@Param("seguido") Usuario seguido);
+
+    List<SeguimientoUsuario> findBySeguidor(Usuario seguidor);
+
+    List<SeguimientoUsuario> findBySeguido(Usuario seguido);
 }

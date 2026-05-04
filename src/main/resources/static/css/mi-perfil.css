@@ -1,0 +1,85 @@
+
+/* NAV: igual estilo que actividad-detalle */
+.top-nav {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.container{
+    margin-top: 40px;
+}
+
+.menu-link {
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0;
+}
+
+.menu-link:hover {
+    color: #2563eb;
+}
+
+.menu-link.active {
+    color: #2563eb;
+    font-weight: bold;
+}
+
+body {
+font-family: 'Inter', sans-serif;
+background: #f6f8fb;
+}
+
+.profile-card {
+max-width: 720px;
+margin: 60px auto;
+border: none;
+border-radius: 28px;
+overflow: hidden;
+box-shadow: 0 16px 40px rgba(16,24,40,.08);
+}
+
+.profile-header {
+background: linear-gradient(135deg,#0d6efd,#4dabf7);
+color: white;
+padding: 32px;
+display: flex;
+align-items: center;
+gap: 24px;
+}
+
+.avatar {
+width: 90px;
+height: 90px;
+border-radius: 50%;
+background: white;
+color: #0d6efd;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 2.2rem;
+font-weight: 800;
+}
+
+.data-box {
+background: #f8f9fa;
+border-radius: 20px;
+padding: 20px;
+}
+
+.data-row {
+display: flex;
+justify-content: space-between;
+padding: 12px 0;
+border-bottom: 1px solid #e9ecef;
+}
+
+.data-row:last-child {
+border-bottom: none;
+}
+
+.btn-rounded {
+border-radius: 999px;
+font-weight: 700;
+padding: 12px 22px;
+}

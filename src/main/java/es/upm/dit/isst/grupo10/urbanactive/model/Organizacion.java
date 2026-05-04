@@ -3,49 +3,81 @@ package es.upm.dit.isst.grupo10.urbanactive.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table (name = "organizaciones")
+@Table(name = "organizaciones")
 public class Organizacion {
-    
-    @EmbeddedId
-    private Identificacion identificacion;
 
-    private String nombre;
+@EmbeddedId
+private Identificacion identificacion;
 
-    @Embedded
-    private Valoracion valoracion;
+@Column(unique = true, nullable = false)
+private String slug;
 
-    public Organizacion() {}
+private String nombre;
 
-    public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion) {
-        this.identificacion = identificacion;
-        this.nombre = nombre;
-        this.valoracion = valoracion;
-    }
+@Embedded
+private Valoracion valoracion;
 
-    public Identificacion getIdentificacion() {
-        return identificacion;
-    }
+public Organizacion() {}
 
-    public void setIdentificacion(Identificacion identificacion) {
-        this.identificacion = identificacion;
-    }
+public Organizacion(Identificacion identificacion, String nombre, Valoracion valoracion) {
+this.identificacion = identificacion;
+this.nombre = nombre;
+this.valoracion = valoracion;
+}
 
-    public String getNombre() {
-        return nombre;
-    }
+@PrePersist
+@PreUpdate
+private void generarSlugSiHaceFalta() {
+if (nombre != null && !nombre.isBlank()) {
+this.slug = slugify(nombre);
+}
+}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+private String slugify(String texto) {
+return texto.toLowerCase()
+.trim()
+.replace("á", "a")
+.replace("é", "e")
+.replace("í", "i")
+.replace("ó", "o")
+.replace("ú", "u")
+.replace("ñ", "n")
+.replaceAll("[^a-z0-9\\s-]", "")
+.replaceAll("\\s+", "-")
+.replaceAll("-+", "-");
+}
 
-    public Valoracion getValoracion() {
-        return valoracion;
-    }
+public Identificacion getIdentificacion() {
+return identificacion;
+}
 
-    public void setValoracion(Valoracion valoracion) {
-        this.valoracion = valoracion;
-    }
+public void setIdentificacion(Identificacion identificacion) {
+this.identificacion = identificacion;
+}
 
+public String getSlug() {
+return slug;
+}
+
+public void setSlug(String slug) {
+this.slug = slug;
+}
+
+public String getNombre() {
+return nombre;
+}
+
+public void setNombre(String nombre) {
+this.nombre = nombre;
+}
+
+public Valoracion getValoracion() {
+return valoracion;
+}
+
+public void setValoracion(Valoracion valoracion) {
+this.valoracion = valoracion;
+}
 }
 
 

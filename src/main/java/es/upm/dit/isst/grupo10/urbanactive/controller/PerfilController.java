@@ -16,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Optional;
 
@@ -183,5 +186,34 @@ public class PerfilController {
         }
 
         return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
+    }
+
+
+    @GetMapping("/perfil/usuario")
+    public String perfilUsuario(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        model.addAttribute("usuario", usuario);
+        return "perfil-usuario";
+    }
+
+    @PostMapping("/perfil/usuario")
+    public String actualizarUsuario(Usuario usuario, HttpSession session) {
+        usuarioRepository.save(usuario);
+        session.setAttribute("usuarioLogueado", usuario);
+        return "redirect:/perfil/usuario";
+    }
+
+    @GetMapping("/perfil/organizacion")
+    public String perfilOrganizacion(HttpSession session, Model model) {
+        Organizacion org = (Organizacion) session.getAttribute("organizacionLogueada");
+        model.addAttribute("organizacion", org);
+        return "perfil-organizacion";
+    }
+
+    @PostMapping("/perfil/organizacion")
+    public String actualizarOrganizacion(Organizacion org, HttpSession session) {
+        organizacionRepository.save(org);
+        session.setAttribute("organizacionLogueada", org);
+        return "redirect:/perfil/organizacion";
     }
 }

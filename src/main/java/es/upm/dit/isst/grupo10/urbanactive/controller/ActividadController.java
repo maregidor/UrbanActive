@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class ActividadController {
@@ -52,11 +51,24 @@ public class ActividadController {
             @RequestParam(required = false) Double userLat,
             @RequestParam(required = false) Double userLon,
             Model model) {
-        
+
         List<Actividad> actividades = actividadService.getActividadesOrdenadas(orden, userLat, userLon);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean autenticado = auth != null
+                && auth.isAuthenticated()
+                && auth.getName() != null
+                && !auth.getName().equals("anonymousUser");
+
+        boolean esOrganizador = autenticado
+                && organizacionRepository.findByEmailDireccion(auth.getName()).isPresent();
+
         model.addAttribute("actividades", actividades);
         model.addAttribute("ordenActual", orden);
-        model.addAttribute("esOrganizador", true);
+        model.addAttribute("autenticado", autenticado);
+        model.addAttribute("esOrganizador", esOrganizador);
+
         return "actividades";
     }
 
@@ -91,7 +103,7 @@ public class ActividadController {
         String username = auth.getName();
 
         List<EspacioPublico> listaEspacios = espacioPublicoRepository.findAll();
-        boolean esOrganizador = organizacionRepository.findByIdentificacionNumero(username).isPresent();
+        boolean esOrganizador = organizacionRepository.findByEmailDireccion(username).isPresent();
        
         model.addAttribute("espacios", listaEspacios); 
         model.addAttribute("actividad", new Actividad());

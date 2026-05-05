@@ -36,9 +36,10 @@
             <p class="text-muted fs-5">Encuentra y reserva tu próxima sesión deportiva en la ciudad.</p>
         </div>
 
-        <a href="/actividades/nueva"
-           class="btn btn-success rounded-pill px-4 py-2 fw-bold">
-            + Crear actividad
+        <a th:if="${autenticado}"
+            href="/actividades/nueva"
+            class="btn btn-success rounded-pill px-4 py-2 fw-bold">
+                + Crear actividad
         </a>
     </div>
 </div>

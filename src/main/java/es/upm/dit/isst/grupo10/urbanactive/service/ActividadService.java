@@ -61,29 +61,45 @@ public class ActividadService {
         return actividadRepository.save(actividad);
     }
     
-    public void crearNuevaActividad(Actividad actividad, String idPrincipal) {
-        Optional<Organizacion> org = organizacionRepository.findByIdentificacionNumero(idPrincipal);
-        if (org.isPresent()) {
-            actividad.setOrganizacion(org.get());
-            actividad.setUsuarioOrganizador(null);
-        } else {
-            Usuario usuario = usuarioRepository.findById(new Email(idPrincipal)).orElse(null);
-            actividad.setUsuarioOrganizador(usuario);
-            actividad.setOrganizacion(null);
-            actividad.setPrecio(0.0);
+    public void crearNuevaActividad(Actividad actividad, String principalEmail) {
+    Optional<Organizacion> organizacionOpt = organizacionRepository.findByEmailDireccion(principalEmail);
+
+    if (organizacionOpt.isPresent()) {
+        Organizacion organizacion = organizacionOpt.get();
+
+        actividad.setOrganizacion(organizacion);
+        actividad.setUsuarioOrganizador(null);
+
+    } else {
+        Usuario usuario = usuarioRepository.findById(new Email(principalEmail)).orElse(null);
+
+        if (usuario == null) {
+            throw new IllegalArgumentException(
+                "No existe ningún usuario u organización con el email autenticado: " + principalEmail
+            );
         }
 
-        if (actividad.getEspacioPublico() != null) {
-            actividad.setLatitud(actividad.getEspacioPublico().getLatitud());
-            actividad.setLongitud(actividad.getEspacioPublico().getLongitud());
-        } 
-        else if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
-            throw new IllegalArgumentException("La actividad debe tener una ubicación (Espacio Público o Coordenadas manuales)");
-        }
+        actividad.setUsuarioOrganizador(usuario);
+        actividad.setOrganizacion(null);
 
-        actividad.setPlazasDisponibles(actividad.getPlazasTotales());
-        actividadRepository.save(actividad);
+        // Los usuarios normales no pueden cobrar por actividades
+        actividad.setPrecio(0.0);
     }
+
+    if (actividad.getEspacioPublico() != null) {
+        actividad.setLatitud(actividad.getEspacioPublico().getLatitud());
+        actividad.setLongitud(actividad.getEspacioPublico().getLongitud());
+
+    } else if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
+        throw new IllegalArgumentException(
+            "La actividad debe tener una ubicación (Espacio Público o Coordenadas manuales)"
+        );
+    }
+
+    actividad.setPlazasDisponibles(actividad.getPlazasTotales());
+
+    actividadRepository.save(actividad);
+}
 
     public List<Actividad> getActividadesOrdenadas(String criterio, Double userLat, Double userLon) {
         

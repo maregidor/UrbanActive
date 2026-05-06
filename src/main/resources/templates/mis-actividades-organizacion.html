@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos | UrbanActive Organizaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/actividades.css}">
+    <style>
+        .dashboard-stat-card {
+            border-left: 4px solid #0d6efd;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="top-nav">
+        <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-3">
+            <div class="fw-bold fs-2">UrbanActive</div>
+
+            <div class="d-flex align-items-center gap-4">
+
+                <a href="/actividades" class="nav-link menu-link active">Actividades</a>
+
+                <th:block sec:authorize="hasRole('USER')">
+                    <a href="/reservas/mis-reservas" class="nav-link menu-link">Mis Reservas</a>
+                    <a href="/mis-actividades-usuario" class="nav-link menu-link">Mis Actividades</a>
+                    <a href="/mis-seguidos" class="nav-link menu-link">Mis Seguidos</a>
+                    <a href="/mi-perfil" class="nav-link menu-link">Mi perfil</a>
+                </th:block>
+
+                <th:block sec:authorize="hasRole('ORGA')">
+                    <a href="/mis-actividades-organizacion" class="nav-link menu-link">Mis Actividades</a>
+                    <a href="/mi-perfil-organizacion" class="nav-link menu-link">Mi Perfil</a>
+                </th:block>
+
+                <a sec:authorize="isAuthenticated()" href="/logout" class="nav-link menu-link">Cerrar sesión</a>
+                <a sec:authorize="!isAuthenticated()" href="/login" class="nav-link menu-link">Iniciar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        
+        <!-- Header de la sección -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold h2 mb-1">Mis Eventos Organizados</h1>
+                <p class="text-muted mb-0">Gestiona las convocatorias de tu entidad deportiva.</p>
+            </div>
+            <a href="/actividades/nueva" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i>Crear evento
+            </a>
+        </div>
+
+        <!-- Panel de Estadísticas (Dashboard mini) -->
+        <div class="row g-3 mb-5" th:unless="${#lists.isEmpty(actividades)}">
+            <div class="col-md-4">
+                <div class="dashboard-stat-card p-3">
+                    <div class="text-muted small fw-bold text-uppercase">Total Eventos</div>
+                    <div class="fs-2 fw-bold text-dark" th:text="${#lists.size(actividades)}">0</div>
+                </div>
+            </div>
+            <!-- Podrías calcular estos datos en el controlador si lo deseas, aquí están como mockups visuales -->
+            <div class="col-md-4">
+                <div class="dashboard-stat-card p-3 border-success">
+                    <div class="text-muted small fw-bold text-uppercase">Eventos Activos</div>
+                    <div class="fs-2 fw-bold text-dark">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div th:if="${#lists.isEmpty(actividades)}" class="card border-0 shadow-sm rounded-4 text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-clipboard-list fa-4x text-light-emphasis mb-3"></i>
+                <h3 class="fw-bold text-dark">No hay eventos activos</h3>
+                <p class="text-muted">Parece que tu organización aún no ha programado ninguna actividad.</p>
+                <a href="/actividades/nueva" class="btn btn-primary rounded-pill mt-2 px-4">Programar primer evento</a>
+            </div>
+        </div>
+
+        <!-- Lista de Actividades en formato Tabla/Lista más profesional -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" th:unless="${#lists.isEmpty(actividades)}">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="ps-4">Evento</th>
+                            <th scope="col">Fecha y Hora</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Plazas</th>
+                            <th scope="col" class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="actividad : ${actividades}">
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center">
+                                    <img th:src="${actividad.imagen}" alt="Logo Evento" class="rounded-3 me-3" 
+                                         style="width: 60px; height: 60px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/60?text=UA'">
+                                    <div>
+                                        <div class="fw-bold text-dark mb-1" th:text="${actividad.titulo}">Título del evento</div>
+                                        <span class="badge bg-secondary rounded-pill" th:text="${actividad.tipo}">Categoría</span>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <div class="fw-semibold text-dark">
+                                    <i class="far fa-calendar-alt text-primary me-1"></i> <span th:text="${actividad.fecha}">Fecha</span>
+                                </div>
+                                <div class="small text-muted" th:text="${actividad.hora}">Hora</div>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success fw-bold px-2 py-1" 
+                                      th:text="${actividad.precio > 0 ? actividad.precio + '€' : 'Gratis'}">0€</span>
+                            </td>
+
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1 me-2" style="max-width: 100px;">
+                                        <!-- Barra de progreso simulada para ilustrar la ocupación -->
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <span class="small fw-semibold text-muted" th:text="${actividad.plazasTotales} + ' total'">0</span>
+                                </div>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a th:href="@{/actividades/{id}(id=${actividad.id})}" class="btn btn-light btn-sm text-primary" title="Ver evento público">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <!-- Botón para ver inscritos (si implementas la vista) -->
+                                    <a href="#" class="btn btn-light btn-sm text-dark" title="Gestionar asistentes">
+                                        <i class="fas fa-users"></i>
+                                    </a>
+                                    <a th:href="@{/actividades/editar/{id}(id=${actividad.id})}" class="btn btn-light btn-sm text-dark" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <!-- Botón de borrar con un toque rojo -->
+                                    <button class="btn btn-light btn-sm text-danger" title="Cancelar evento">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card-footer bg-white text-center py-3 border-top">
+                <small class="text-muted">Mostrando todas las actividades vigentes de la organización.</small>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -6,13 +6,14 @@ import es.upm.dit.isst.grupo10.urbanactive.service.*;
 import es.upm.dit.isst.grupo10.urbanactive.dto.ActividadContexto;
 import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
 
+import java.util.Optional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.MultipartFile; // Nuevo import
+import org.springframework.web.multipart.MultipartFile; 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -172,5 +174,67 @@ public class ActividadController {
             return null;
         }
         return usuarioRepository.findById(new Email(auth.getName())).orElse(null);
+    }
+
+    @GetMapping("/mi-perfil-organizacion")
+    public String miPerfilOrganizacion(Model model, Principal principal) {
+        // Principal es una forma más directa de obtener el username (email)
+        String emailLogueado = principal.getName(); 
+
+        // OJO: Verifica en OrganizacionRepository que este método existe
+        Optional<Organizacion> orgaOpt = organizacionRepository.findByEmailDireccion(emailLogueado);
+
+        if (orgaOpt.isPresent()) {
+            model.addAttribute("organizacion", orgaOpt.get());
+            return "mi-perfil-organizacion";
+        }
+        
+        // Si llegas aquí, es que Spring Security te reconoce, pero el Repo no te encuentra
+        System.out.println("ERROR: Organización no encontrada en DB para el email: " + emailLogueado);
+        return "redirect:/actividades?error=not_found";
+    }
+
+    @GetMapping("/mis-actividades-organizacion")
+    public String misActividadesOrga(Model model, Principal principal) {
+        String email = principal.getName();
+        System.out.println("--- INICIO GESTIÓN ACTIVIDADES ORGA ---");
+        System.out.println("Email logueado: " + email);
+
+        Optional<Organizacion> orgaOpt = organizacionRepository.findByEmailDireccion(email);
+
+        if (orgaOpt.isPresent()) {
+            Organizacion orga = orgaOpt.get();
+            String tipo = orga.getIdentificacion().getTipo();
+            String numero = orga.getIdentificacion().getNumero();
+            
+            System.out.println("Organización encontrada: " + orga.getNombre());
+            System.out.println("Buscando actividades para ID: " + tipo + " " + numero);
+
+            try {
+                List<Actividad> lista = actividadService.getActividadesPorOrganizacion(tipo, numero);
+                System.out.println("Actividades encontradas: " + lista.size());
+                
+                model.addAttribute("actividades", lista);
+                return "mis-actividades-organizacion";
+            } catch (Exception e) {
+                System.out.println("ERROR al recuperar actividades: " + e.getMessage());
+                e.printStackTrace();
+                return "redirect:/actividades?error=error_en_consulta";
+            }
+        } else {
+            System.out.println("ERROR: No se encontró la orga con email " + email + " en este método.");
+            return "redirect:/actividades?error=orga_no_encontrada";
+        }
+    }
+
+    @GetMapping("/mis-actividades-usuario")
+    public String misActividadesUsuario(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); 
+
+        List<Actividad> misActividades = actividadService.getActividadesPorCreador(email);
+        
+        model.addAttribute("actividades", misActividades);
+        return "mis-actividades-usuario";
     }
 }

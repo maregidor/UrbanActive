@@ -136,5 +136,13 @@ public class ActividadService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
+
+    public List<Actividad> getActividadesPorCreador(String email) {
+        return actividadRepository.findByUsuarioOrganizadorEmailDireccion(email); 
+    }
+
+    public List<Actividad> getActividadesPorOrganizacion(String tipo, String numero) {
+        return actividadRepository.findByOrganizacionIdentificacionTipoAndOrganizacionIdentificacionNumero(tipo, numero);
+    }
 }
 

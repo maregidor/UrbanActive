@@ -50,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
             return User.withUsername(org.getEmail().getDireccion())
                     .password(org.getPassword())
-                    .roles("ORG") // 👈 importante diferenciar
+                    .roles("ORGA") // 👈 importante diferenciar
                     .build();
         }
 

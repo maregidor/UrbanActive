@@ -17,6 +17,7 @@ public interface ActividadRepository extends JpaRepository<Actividad, Long>  {
     List<Actividad> findByUsuarioOrganizador(Usuario usuario);
     List<Actividad> findByUsuarioOrganizadorIn(List<Usuario> usuarios);
     List<Actividad> findByOrganizacionIn (List<Organizacion> organizaciones);
-
-List<Actividad> findByOrganizacion(Organizacion organizacion);
+    List<Actividad> findByUsuarioOrganizadorEmailDireccion(String email);
+    List<Actividad> findByOrganizacionIdentificacionTipoAndOrganizacionIdentificacionNumero(String tipo, String numero);
+    List<Actividad> findByOrganizacion(Organizacion organizacion);
 }

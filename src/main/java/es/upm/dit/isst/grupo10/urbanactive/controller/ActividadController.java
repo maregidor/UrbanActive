@@ -11,7 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile; // Nuevo import
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,6 +112,17 @@ public class ActividadController {
         model.addAttribute("esOrganizador", esOrganizador);
         
         return "crear-actividad";
+    }
+
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public String handleMaxSizeException(MaxUploadSizeExceededException exc, RedirectAttributes redirectAttributes) {
+            redirectAttributes.addFlashAttribute("mensajeError", "¡El archivo es demasiado grande! Intenta con uno de menos de 10MB.");
+            
+            return "redirect:/actividades/nueva";
+        }
     }
 
     @PostMapping("/actividades/guardar")

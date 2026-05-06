@@ -39,6 +39,12 @@
                         <p class="text-muted">Completa los detalles para publicar tu sesión deportiva.</p>
                     </div>
 
+                    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span th:text="${mensajeError}">Mensaje de error</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
                     <form th:action="@{/actividades/guardar}" th:object="${actividad}" method="post" enctype="multipart/form-data">
                         
                         <div class="row">
@@ -181,6 +187,28 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script th:inline="javascript">
+        const MAX_SIZE = 10 * 1024 * 1024; 
+
+        const fileInput = document.querySelector('input[name="imagenArchivo"]');
+        const form = document.querySelector('form');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                if (this.files[0].size > MAX_SIZE) {
+                    alert("⚠️ El fichero es demasiado pesado. El máximo permitido son 10MB.");
+
+                    this.value = ''; 
+                }
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            if (fileInput.files.length > 0 && fileInput.files[0].size > MAX_SIZE) {
+                e.preventDefault(); // Evitamos que el formulario se envíe
+                alert("Por favor, elige una imagen más ligera antes de publicar.");
+            }
+        });
+
         const map = L.map('map').setView([40.4168, -3.7038], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'

@@ -14,7 +14,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/login", "/css/**", "/js/**", "/h2-console/**").permitAll()
-            .requestMatchers("/", "/actividades").permitAll() // La lista de actividades es pública
+            .requestMatchers("/", "/actividades", "/register/**").permitAll() // La lista de actividades es pública
             .anyRequest().authenticated() 
         )
         .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

@@ -19,10 +19,11 @@
 
             <div class="d-flex align-items-center gap-4">
                 <a href="/actividades" class="nav-link menu-link active">Actividades</a>
-                <a href="/reservas/mis-reservas" class="nav-link menu-link">Mis Reservas</a>
-                <a href="/mis-seguidos" class="nav-link menu-link">Mis Seguidos</a>
-                <a href="/mi-perfil" class="nav-link menu-link">Mi perfil</a>
-                <a href="/logout" class="nav-link menu-link">Cerrar sesión</a>
+                <a sec:authorize="hasRole('USER')" href="/reservas/mis-reservas" class="nav-link menu-link">Mis Reservas</a>
+                <a sec:authorize="hasRole('USER')" href="/mis-seguidos" class="nav-link menu-link">Mis Seguidos</a>
+                <a sec:authorize="hasRole('USER')" href="/mi-perfil" class="nav-link menu-link">Mi perfil</a>
+                <a sec:authorize="isAuthenticated()" href="/logout" class="nav-link menu-link">Cerrar sesión</a>
+                <a sec:authorize="!isAuthenticated()" href="/login" class="nav-link menu-link">Iniciar sesión</a>
             </div>
         </div>
     </nav>

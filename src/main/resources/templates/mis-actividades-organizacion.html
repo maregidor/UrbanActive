@@ -158,9 +158,13 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <!-- Botón de borrar con un toque rojo -->
-                                    <button class="btn btn-light btn-sm text-danger" title="Cancelar evento">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <form th:action="@{/actividades/eliminar/{id}(id=${actividad.id})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-light btn-sm text-danger" 
+                                                onclick="return confirm('¿Estás seguro de que quieres cancelar este evento? Se borrarán todos los datos y asistentes asociados.')"
+                                                title="Cancelar evento">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

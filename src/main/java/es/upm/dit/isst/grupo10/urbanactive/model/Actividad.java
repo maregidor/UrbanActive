@@ -50,7 +50,7 @@ public class Actividad {
     @ManyToOne(cascade = CascadeType.ALL)
     private CondicionEntorno condicionesEntorno;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
         name="actividad_reservas",
         joinColumns = @JoinColumn(name="actividad_id"),

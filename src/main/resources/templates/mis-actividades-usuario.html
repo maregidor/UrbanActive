@@ -103,10 +103,13 @@
                                 <a th:href="@{/actividades/editar/{id}(id=${actividad.id})}" class="btn btn-light rounded-pill flex-grow-1 fw-semibold btn-sm border">
                                     <i class="fas fa-edit me-2"></i>Editar
                                 </a>
-                                <button class="btn btn-light rounded-pill text-danger btn-sm px-3 border" 
-                                        title="Eliminar actividad">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <form th:action="@{/actividades/eliminar/{id}(id=${actividad.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-light rounded-pill text-danger btn-sm px-3 border" 
+                                            onclick="return confirm('¿Estás seguro de que quieres eliminar esta actividad? Esta acción no se puede deshacer.')"
+                                            title="Eliminar actividad">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

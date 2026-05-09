@@ -3,6 +3,7 @@ package es.upm.dit.isst.grupo10.urbanactive.controller;
 import es.upm.dit.isst.grupo10.urbanactive.model.*;
 import es.upm.dit.isst.grupo10.urbanactive.repository.*;
 import es.upm.dit.isst.grupo10.urbanactive.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import es.upm.dit.isst.grupo10.urbanactive.dto.ActividadContexto;
 import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
 
@@ -318,5 +319,30 @@ public class ActividadController {
             }
         }
         return "redirect:/actividades";
+    }
+
+    @PostMapping("/actividades/eliminar/{id}")
+    public String eliminarActividad(@PathVariable Long id, Principal principal, HttpServletRequest request) {
+        String emailLogueado = principal.getName();
+        Optional<Actividad> actividadOpt = actividadRepository.findById(id);
+
+        if (actividadOpt.isPresent()) {
+            Actividad actividad = actividadOpt.get();
+
+            // Seguridad: Verificar que el logueado es el dueño (Usuario u Orga)
+            boolean esDueño = (actividad.getUsuarioOrganizador() != null && actividad.getUsuarioOrganizador().getEmail().getDireccion().equals(emailLogueado)) ||
+                            (actividad.getOrganizacion() != null && actividad.getOrganizacion().getEmail().getDireccion().equals(emailLogueado));
+
+            if (esDueño) {
+                actividadRepository.delete(actividad);
+                System.out.println("Actividad " + id + " eliminada por " + emailLogueado);
+                
+                // Redirección inteligente: volvemos a la página desde la que venía el usuario
+                String referer = request.getHeader("Referer");
+                return "redirect:" + (referer != null ? referer : "/actividades");
+            }
+        }
+
+        return "redirect:/actividades?error=no_autorizado";
     }
 }

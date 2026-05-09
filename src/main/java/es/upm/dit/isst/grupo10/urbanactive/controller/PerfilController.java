@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -267,6 +268,37 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         return "redirect:/perfil/organizacion";
     }
 
+    @GetMapping("/organizacion/editar")
+    public String mostrarFormularioEditarOrga(Model model, Principal principal) {
+        String emailLogueado = principal.getName();
+
+        return organizacionRepository.findByEmailDireccion(emailLogueado)
+            .map(orga -> {
+                model.addAttribute("organizacion", orga);
+                return "editar-mi-perfil-organizacion"; // Nombre del archivo HTML
+            })
+            .orElse("redirect:/mi-perfil-organizacion?error=no_encontrada");
+    }
+
+    @PostMapping("/organizacion/editar")
+    public String procesarEditarOrga(@RequestParam String nombre, 
+                                    @RequestParam String actividad, 
+                                    Principal principal) {
+        String emailLogueado = principal.getName();
+
+        return organizacionRepository.findByEmailDireccion(emailLogueado)
+            .map(orga -> {
+                // Actualizamos solo los campos que permitimos en el formulario
+                orga.setNombre(nombre);
+                orga.setActividad(actividad);
+                
+                organizacionRepository.save(orga);
+                
+                System.out.println("Perfil actualizado con éxito: " + emailLogueado);
+                return "redirect:/mi-perfil-organizacion?success=perfil_actualizado";
+            })
+            .orElse("redirect:/mi-perfil-organizacion?error=error_al_guardar");
+    }
 
     // MÉTODO AUXILIAR
     

@@ -266,4 +266,57 @@ public class ActividadController {
         
         return "redirect:/actividades?error=acceso_denegado";
     }
+
+    @GetMapping("/actividades/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model, Principal principal) {
+        Optional<Actividad> actividadOpt = actividadRepository.findById(id);
+
+        if (actividadOpt.isPresent()) {
+            Actividad actividad = actividadOpt.get();
+            String emailLogueado = principal.getName();
+
+            boolean esDueño = (actividad.getUsuarioOrganizador() != null && actividad.getUsuarioOrganizador().getEmail().getDireccion().equals(emailLogueado)) ||
+                            (actividad.getOrganizacion() != null && actividad.getOrganizacion().getEmail().getDireccion().equals(emailLogueado));
+
+            if (esDueño) {
+                model.addAttribute("actividad", actividad);
+                model.addAttribute("modo", "editar"); 
+                return "crear-actividad"; 
+            }
+        }
+        return "redirect:/actividades?error=no_autorizado";
+    }
+
+    @PostMapping("/actividades/editar/{id}")
+    public String procesarEdicion(@PathVariable Long id, @ModelAttribute Actividad actividadEditada, Principal principal) {
+        Optional<Actividad> actividadOpt = actividadRepository.findById(id);
+
+        if (actividadOpt.isPresent()) {
+            Actividad actividadExistente = actividadOpt.get();
+            String emailLogueado = principal.getName();
+
+            boolean esDueño = (actividadExistente.getUsuarioOrganizador() != null && actividadExistente.getUsuarioOrganizador().getEmail().getDireccion().equals(emailLogueado)) ||
+                            (actividadExistente.getOrganizacion() != null && actividadExistente.getOrganizacion().getEmail().getDireccion().equals(emailLogueado));
+
+            if (esDueño) {
+                actividadExistente.setTitulo(actividadEditada.getTitulo());
+                actividadExistente.setDescripcion(actividadEditada.getDescripcion());
+                actividadExistente.setFecha(actividadEditada.getFecha());
+                actividadExistente.setHora(actividadEditada.getHora());
+                actividadExistente.setPlazasTotales(actividadEditada.getPlazasTotales());
+                actividadExistente.setPrecio(actividadEditada.getPrecio());
+                actividadExistente.setTipo(actividadEditada.getTipo());
+                
+                if (actividadEditada.getImagen() != null && !actividadEditada.getImagen().isEmpty()) {
+                    actividadExistente.setImagen(actividadEditada.getImagen());
+                }
+
+                actividadRepository.save(actividadExistente);
+                
+                if (actividadExistente.getOrganizacion() != null) return "redirect:/mis-actividades-organizacion";
+                return "redirect:/mis-actividades-usuario";
+            }
+        }
+        return "redirect:/actividades";
+    }
 }

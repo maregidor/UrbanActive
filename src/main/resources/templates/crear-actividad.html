@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear actividad | UrbanActive</title>
+    <title th:text="${modo == 'editar' ? 'Editar actividad | UrbanActive' : 'Crear actividad | UrbanActive'}">Crear actividad</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -22,8 +22,8 @@
         <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-3">
             <div class="fw-bold fs-2 text-primary">UrbanActive</div>
             <div class="d-flex align-items-center gap-4">
-                <a href="/actividades" class="btn btn-outline-secondary rounded-pill">
-                    <i class="fas fa-arrow-left me-2"></i>Volver
+                <a th:href="${esOrganizador != null && esOrganizador ? '/mis-actividades-organizacion' : '/mis-actividades-usuario'}" class="btn btn-outline-secondary rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i>Cancelar
                 </a>
             </div>
         </div>
@@ -35,8 +35,10 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
                     
                     <div class="mb-4">
-                        <h1 class="fw-bold h2">Crear nueva actividad</h1>
-                        <p class="text-muted">Completa los detalles para publicar tu sesión deportiva.</p>
+                        <h1 class="fw-bold" th:text="${modo == 'editar' ? 'Editar Actividad' : 'Crear Nueva Actividad'}">
+                            Crear Nueva Actividad
+                        </h1>
+                        <p class="text-muted" th:text="${modo == 'editar' ? 'Modifica los detalles de tu sesión deportiva.' : 'Completa los detalles para publicar tu sesión deportiva.'}">Completa los detalles.</p>
                     </div>
 
                     <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
@@ -45,7 +47,8 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     
-                    <form th:action="@{/actividades/guardar}" th:object="${actividad}" method="post" enctype="multipart/form-data">
+                    <!-- El action cambia según el modo -->
+                    <form th:action="${modo == 'editar' ? '/actividades/editar/' + actividad.id : '/actividades/guardar'}" th:object="${actividad}" method="post" enctype="multipart/form-data">
                         
                         <div class="row">
                             <div class="col-md-12 mb-3">
@@ -68,6 +71,7 @@
                                     <option value="Expresión artística">Expresión artística</option>
                                 </select>
                             </div>
+                            <!-- Ojo: aquí no usabas th:field, asegúrate de que el backend captura "nivelDificultad" o cámbialo a th:field si lo tienes en el modelo Actividad -->
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Nivel</label>
                                 <select name="nivelDificultad" class="form-select rounded-3">
@@ -125,16 +129,15 @@
                                             <label class="form-label small fw-bold text-muted text-uppercase">Subir desde el equipo</label>
                                             <input type="file" name="imagenArchivo" class="form-control" accept="image/*">
                                         </div>
-                                        <div class="col-md-2 text-center text-muted fw-bold">
-                                            O
-                                        </div>
+                                        <div class="col-md-2 text-center text-muted fw-bold">O</div>
                                         <div class="col-md-5">
                                             <label class="form-label small fw-bold text-muted text-uppercase">Proporcionar enlace URL</label>
                                             <input type="url" th:field="*{imagen}" class="form-control" placeholder="https://ejemplo.com/foto.jpg">
                                         </div>
                                     </div>
                                     <div class="form-text mt-3">
-                                        <i class="fas fa-info-circle me-1"></i> Se recomienda subir una imagen con formato horizontal (16:9). Si se proporcionan ambas opciones, el archivo subido tendrá prioridad.
+                                        <i class="fas fa-info-circle me-1"></i> 
+                                        <span th:text="${modo == 'editar' ? 'Si no subes nada, se mantendrá la imagen actual.' : 'Se recomienda subir una imagen con formato horizontal (16:9). Si se proporcionan ambas, el archivo tiene prioridad.'}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -163,11 +166,12 @@
                             <div class="col-md-6 mb-3" th:unless="${esOrganizador}">
                                 <label class="form-label fw-semibold">Precio</label>
                                 <input type="text" class="form-control rounded-3 bg-light" value="Gratis (Solo organizadores pueden cobrar)" readonly>
-                                <input type="hidden" th:field="*{precio}" value="0.0">
+                                <input type="hidden" th:field="*{precio}">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Plazas totales</label>
+                                <!-- Al editar, comprobamos que no ponga menos plazas de las que ya están ocupadas (Opcional pero recomendado) -->
                                 <input type="number" th:field="*{plazasTotales}" class="form-control rounded-3" min="1" required>
                             </div>
                         </div>
@@ -176,7 +180,8 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm">
-                                <i class="fas fa-plus-circle me-2"></i>Publicar Actividad
+                                <i th:class="${modo == 'editar' ? 'fas fa-save me-2' : 'fas fa-plus-circle me-2'}"></i>
+                                <span th:text="${modo == 'editar' ? 'Guardar Cambios' : 'Publicar Actividad'}">Botón</span>
                             </button>
                         </div>
                     </form>
@@ -187,29 +192,35 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script th:inline="javascript">
+        /*<![CDATA[*/
         const MAX_SIZE = 10 * 1024 * 1024; 
-
         const fileInput = document.querySelector('input[name="imagenArchivo"]');
         const form = document.querySelector('form');
 
         fileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                if (this.files[0].size > MAX_SIZE) {
-                    alert("⚠️ El fichero es demasiado pesado. El máximo permitido son 10MB.");
-
-                    this.value = ''; 
-                }
+            if (this.files && this.files[0] && this.files[0].size > MAX_SIZE) {
+                alert("⚠️ El fichero es demasiado pesado. El máximo permitido son 10MB.");
+                this.value = ''; 
             }
         });
 
         form.addEventListener('submit', function(e) {
             if (fileInput.files.length > 0 && fileInput.files[0].size > MAX_SIZE) {
-                e.preventDefault(); // Evitamos que el formulario se envíe
+                e.preventDefault();
                 alert("Por favor, elige una imagen más ligera antes de publicar.");
             }
         });
 
-        const map = L.map('map').setView([40.4168, -3.7038], 13);
+        // Valores iniciales (para cuando estamos en MODO EDITAR)
+        const latInicial = /*[[${actividad.latitud}]]*/ null;
+        const lonInicial = /*[[${actividad.longitud}]]*/ null;
+        
+        // Inicializamos el mapa en Madrid por defecto, o en las coordenadas guardadas
+        const map = L.map('map').setView(
+            (latInicial && lonInicial) ? [latInicial, lonInicial] : [40.4168, -3.7038], 
+            (latInicial && lonInicial) ? 16 : 13
+        );
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
@@ -219,6 +230,12 @@
         const searchInput = document.getElementById('espacioSearch');
         const latInput = document.getElementById('latitud');
         const lonInput = document.getElementById('longitud');
+
+        // Si hay coordenadas al cargar, dibujamos el marcador (Modo Editar)
+        if (latInicial && lonInicial) {
+            updateMarker(latInicial, lonInicial, "Ubicación actual guardada");
+            document.getElementById('coordsHelp').innerHTML = `<i class="fas fa-check me-1"></i> Punto guardado: ${latInicial}, ${lonInicial}`;
+        }
 
         const originalOptions = Array.from(espacioSelect.options);
         searchInput.addEventListener('input', (e) => {
@@ -248,7 +265,7 @@
         map.on('click', (e) => {
             const lat = e.latlng.lat.toFixed(6);
             const lon = e.latlng.lng.toFixed(6);
-            espacioSelect.value = "";
+            espacioSelect.value = ""; // Desmarcamos el select si pincha en el mapa
             latInput.value = lat;
             lonInput.value = lon;
             updateMarker(lat, lon, "Ubicación personalizada fijada");
@@ -259,6 +276,7 @@
             if (marker) map.removeLayer(marker);
             marker = L.marker([lat, lon]).addTo(map).bindPopup(popupText).openPopup();
         }
+        /*]]>*/
     </script>
 </body>
 </html>

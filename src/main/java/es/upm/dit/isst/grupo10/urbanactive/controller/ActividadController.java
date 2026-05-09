@@ -7,6 +7,7 @@ import es.upm.dit.isst.grupo10.urbanactive.dto.ActividadContexto;
 import es.upm.dit.isst.grupo10.urbanactive.dto.GeoPoint;
 
 import java.util.Optional;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ import java.util.List;
 @Controller
 public class ActividadController {
 
+    private final ActividadRepository actividadRepository;
     private final ActividadService actividadService;
     private final ReservaService reservaService;
     private final UsuarioRepository usuarioRepository;
@@ -40,13 +42,15 @@ public class ActividadController {
                                UsuarioRepository usuarioRepository,
                                ActividadContextService actividadContextService,
                                EspacioPublicoRepository espacioPublicoRepository,
-                               OrganizacionRepository organizacionRepository) {
+                               OrganizacionRepository organizacionRepository,
+                               ActividadRepository actividadRepository) {
         this.actividadService = actividadService;
         this.reservaService = reservaService;
         this.usuarioRepository = usuarioRepository;
         this.actividadContextService = actividadContextService;
         this.espacioPublicoRepository = espacioPublicoRepository;
         this.organizacionRepository = organizacionRepository;
+        this.actividadRepository = actividadRepository;
     }
 
     @GetMapping("/actividades")
@@ -236,5 +240,30 @@ public class ActividadController {
         
         model.addAttribute("actividades", misActividades);
         return "mis-actividades-usuario";
+    }
+
+    @GetMapping("/actividades/{id}/asistentes")
+    public String verAsistentes(@PathVariable Long id, Model model, Principal principal) {
+        String emailLogueado = principal.getName();
+        
+        Optional<Actividad> actividadOpt = actividadRepository.findById(id);
+        
+        if (actividadOpt.isPresent()) {
+            Actividad actividad = actividadOpt.get();
+            
+            boolean esOrgaDueña = actividad.getOrganizacion() != null && 
+                                actividad.getOrganizacion().getEmail().getDireccion().equals(emailLogueado);
+            
+            boolean esUsuarioDueño = actividad.getUsuarioOrganizador() != null && 
+                                    actividad.getUsuarioOrganizador().getEmail().getDireccion().equals(emailLogueado);
+
+            if (esOrgaDueña || esUsuarioDueño) {
+                model.addAttribute("actividad", actividad);
+                model.addAttribute("asistentes", reservaService.getAsistentesActivos(id));
+                return "asistentes-actividad";
+            }
+        }
+        
+        return "redirect:/actividades?error=acceso_denegado";
     }
 }

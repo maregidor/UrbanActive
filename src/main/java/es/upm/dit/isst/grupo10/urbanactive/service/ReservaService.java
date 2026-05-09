@@ -8,6 +8,7 @@ import es.upm.dit.isst.grupo10.urbanactive.repository.UsuarioRepository;
 import es.upm.dit.isst.grupo10.urbanactive.repository.ActividadRepository;
 import es.upm.dit.isst.grupo10.urbanactive.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class ReservaService {
         this.reservaRepository = reservaRepository;
     }
 
+    @Transactional // ¡Crucial para que se guarde la tabla intermedia!
     public boolean reservarPlaza(Usuario usuario, Long actividadId) {
         try {
             Optional<Actividad> actividadOpt = actividadRepository.findById(actividadId);
@@ -48,19 +50,33 @@ public class ReservaService {
                 actividadId,
                 actividad.getPrecio()
             );
+            reserva.confirmarReserva(); // Lo marcamos como activo antes de guardar
+
+            // --- EL CAMBIO CLAVE: VINCULAMOS LA RESERVA A LA ACTIVIDAD ---
+            actividad.getReservas().add(reserva);
 
             // Reducir plazas disponibles
             actividad.setPlazasDisponibles(actividad.getPlazasDisponibles() - 1);
-            actividadRepository.save(actividad);
             
-            reserva.confirmarReserva();
+            // Guardamos primero la reserva para que se genere su ID en BD
             reservaRepository.save(reserva);
+            
+            // Guardamos la actividad, lo que automáticamente insertará el registro en actividad_reservas
+            actividadRepository.save(actividad); 
 
             return true;
 
         } catch (Exception e) {
+            System.out.println("Error al reservar: " + e.getMessage());
             return false;
         }
+    }
+
+    public List<Usuario> getAsistentesActivos(Long actividadId) {
+        return reservaRepository.findByActividadId(actividadId).stream()
+                .filter(Reserva::estaActiva) 
+                .map(Reserva::getUsuario)    
+                .toList();
     }
 
     public boolean yaTieneReservaActiva(Usuario usuario, Long actividadId) {
@@ -90,6 +106,7 @@ public class ReservaService {
         return reservaRepository.findById(reservaId).orElse(null);
     }
 
+    @Transactional // Evita inconsistencias al cancelar
     public boolean cancelarReserva(Long reservaId, Usuario usuario) {
         try {
             Optional<Reserva> reservaOpt = reservaRepository.findById(reservaId);
@@ -115,19 +132,6 @@ public class ReservaService {
             return true;
 
         } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean cancelarReserva(Long reservaId, String email) {
-        try {
-            Email emailObj = new Email(email);
-            Optional<Usuario> usuarioOpt = usuarioRepository.findById(emailObj);
-            if (usuarioOpt.isEmpty()) {
-                return false;
-            }
-            return cancelarReserva(reservaId, usuarioOpt.get());
-        } catch (IllegalArgumentException e) {
             return false;
         }
     }

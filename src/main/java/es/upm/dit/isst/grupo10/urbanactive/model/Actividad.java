@@ -50,7 +50,7 @@ public class Actividad {
     @ManyToOne(cascade = CascadeType.ALL)
     private CondicionEntorno condicionesEntorno;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name="actividad_reservas",
         joinColumns = @JoinColumn(name="actividad_id"),
@@ -74,11 +74,14 @@ public class Actividad {
     public List<Usuario> getParticipantes() {
         List<Usuario> participantes = new ArrayList<>();
         for (Reserva reserva : reservas) {
-            if (reserva.estaActiva()) {
-                participantes.add(reserva.getUsuario());
-            }
+            participantes.add(reserva.getUsuario());
         }
         return participantes;
+    }
+
+    public void añadirReserva(Reserva reserva) {
+        this.reservas.add(reserva);
+        reserva.setActividadId(this.id);
     }
 
     // --- GETTERS (El de usuarioOrganizador es la clave del error) ---

@@ -18,4 +18,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findActivasByUsuario(@Param("usuario") Usuario usuario);
     
     List<Reserva> findByUsuarioAndActividadId(Usuario usuario, Long actividadId);
+
+    List<Reserva> findByActividadId(Long actividadId);
 }

@@ -126,12 +126,22 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1 me-2" style="max-width: 100px;">
-                                        <!-- Barra de progreso simulada para ilustrar la ocupación -->
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress" style="height: 6px; background-color: #e9ecef;">
+                                            <div class="progress-bar bg-primary" 
+                                                role="progressbar" 
+                                                th:style="'width: ' + (${(actividad.plazasTotales - actividad.plazasDisponibles) * 100 / actividad.plazasTotales}) + '%'"
+                                                th:aria-valuenow="${actividad.plazasTotales - actividad.plazasDisponibles}" 
+                                                aria-valuemin="0" 
+                                                th:aria-valuemax="${actividad.plazasTotales}">
+                                            </div>
                                         </div>
                                     </div>
-                                    <span class="small fw-semibold text-muted" th:text="${actividad.plazasTotales} + ' total'">0</span>
+                                    
+                                    <span class="small fw-semibold text-muted">
+                                        <span th:text="${actividad.plazasTotales - actividad.plazasDisponibles}">0</span>
+                                        de 
+                                        <span th:text="${actividad.plazasTotales}">0</span>
+                                    </span>
                                 </div>
                             </td>
 
@@ -141,7 +151,7 @@
                                         <i class="fas fa-external-link-alt"></i>
                                     </a>
                                     <!-- Botón para ver inscritos (si implementas la vista) -->
-                                    <a href="#" class="btn btn-light btn-sm text-dark" title="Gestionar asistentes">
+                                    <a th:href="@{/actividades/{id}/asistentes(id=${actividad.id})}" class="btn btn-light btn-sm text-dark" title="Gestionar asistentes">
                                         <i class="fas fa-users"></i>
                                     </a>
                                     <a th:href="@{/actividades/editar/{id}(id=${actividad.id})}" class="btn btn-light btn-sm text-dark" title="Editar">

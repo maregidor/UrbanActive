@@ -90,16 +90,20 @@
                             <div class="fw-bold text-dark" th:text="${actividad.precio > 0 ? actividad.precio + '€' : 'Gratis'}">0€</div>
                         </div>
 
-                        <!-- Botones de gestión -->
                         <div class="d-grid gap-2">
-                            <a th:href="@{/actividades/{id}(id=${actividad.id})}" class="btn btn-outline-primary rounded-pill fw-semibold btn-sm">
-                                <i class="fas fa-eye me-2"></i>Ver cómo lo ven otros
+                            <a th:href="@{/actividades/{id}/asistentes(id=${actividad.id})}" class="btn btn-primary rounded-pill fw-semibold btn-sm shadow-sm">
+                                <i class="fas fa-users me-2"></i>Gestionar Asistentes
                             </a>
+                            
+                            <a th:href="@{/actividades/{id}(id=${actividad.id})}" class="btn btn-outline-secondary rounded-pill fw-semibold btn-sm">
+                                <i class="fas fa-eye me-2"></i>Vista pública
+                            </a>
+
                             <div class="d-flex gap-2">
-                                <a th:href="@{/actividades/editar/{id}(id=${actividad.id})}" class="btn btn-light rounded-pill flex-grow-1 fw-semibold btn-sm">
+                                <a th:href="@{/actividades/editar/{id}(id=${actividad.id})}" class="btn btn-light rounded-pill flex-grow-1 fw-semibold btn-sm border">
                                     <i class="fas fa-edit me-2"></i>Editar
                                 </a>
-                                <button class="btn btn-light rounded-pill text-danger btn-sm px-3" 
+                                <button class="btn btn-light rounded-pill text-danger btn-sm px-3 border" 
                                         title="Eliminar actividad">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>

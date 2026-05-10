@@ -119,7 +119,7 @@ public class Actividad {
     public void setHora(LocalTime hora) { this.hora = hora; }
     public void setDuracion(String duracion) { this.duracion = duracion; }
     public void setImagen(String imagen) { this.imagen = imagen; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public void setPrecio(Double precio) { this.precio = precio; }
     public void setEspacioPublico(EspacioPublico espacioPublico) { this.espacioPublico = espacioPublico; }
     public void setCondicionesEntorno(CondicionEntorno condicionesEntorno) { this.condicionesEntorno = condicionesEntorno; }
     public void setReservas(List<Reserva> reservas) { this.reservas = reservas; }

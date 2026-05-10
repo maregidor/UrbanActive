@@ -134,42 +134,41 @@ public class ActividadController {
 
     @PostMapping("/actividades/guardar")
     public String guardarActividad(@ModelAttribute("actividad") Actividad actividad,
-                                   @RequestParam("imagenArchivo") MultipartFile imagenArchivo) {
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String idPrincipal = auth.getName(); 
+                                @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
+                                @RequestParam Long espacioPublicoId) {
 
-        // Lógica para procesar la subida del archivo local
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String idPrincipal = auth.getName();
+
         if (!imagenArchivo.isEmpty()) {
             try {
-                // Definimos la carpeta de destino
                 String carpetaUploads = "uploads";
                 File directorio = new File(carpetaUploads);
                 if (!directorio.exists()) {
                     directorio.mkdirs();
                 }
 
-                // Generamos un nombre único para evitar que se sobrescriban archivos
                 String nombreArchivo = System.currentTimeMillis() + "_" + imagenArchivo.getOriginalFilename();
                 Path rutaCompleta = Paths.get(carpetaUploads).resolve(nombreArchivo);
 
-                // Copiamos el archivo al sistema de ficheros
                 Files.copy(imagenArchivo.getInputStream(), rutaCompleta, StandardCopyOption.REPLACE_EXISTING);
 
-                // Guardamos la ruta relativa en el objeto Actividad
-                // El navegador accederá vía /uploads/nombre_archivo.jpg
                 actividad.setImagen("/uploads/" + nombreArchivo);
 
             } catch (IOException e) {
                 System.err.println("Error al subir el archivo: " + e.getMessage());
-                // Si falla la subida, se mantendrá la URL de la imagen si se proporcionó una
             }
         }
-        // Si no hay archivo pero sí hay URL en 'actividad.imagen' (por el th:field), 
-        // no hace falta hacer nada extra, ya viene en el objeto.
+
+        EspacioPublico espacio = espacioPublicoRepository.findById(espacioPublicoId)
+                .orElseThrow(() -> new IllegalArgumentException("El espacio público seleccionado no existe"));
+
+        actividad.setEspacioPublico(espacio);
+        actividad.setLatitud(espacio.getLatitud());
+        actividad.setLongitud(espacio.getLongitud());
 
         actividadService.crearNuevaActividad(actividad, idPrincipal);
-    
+
         return "redirect:/actividades";
     }
 

@@ -1,0 +1,288 @@
+{
+  "info": {
+    "_postman_id": "bbb99e21-501e-4a27-83f1-dd5429d12f1a",
+    "name": "Urbanactive",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54651669",
+    "_collection_link": "https://go.postman.co/collection/54651669-bbb99e21-501e-4a27-83f1-dd5429d12f1a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "http://localhost:8081/actividades",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"La respuesta contiene Actividades\", function () {\r",
+              "pm.expect(pm.response.text()).to.include(\"Actividades\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actividades",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actividades"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/actividades/1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Carga detalle de actividad\", function () {\r",
+              "pm.expect(pm.response.text()).to.include(\"UrbanActive\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actividades/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actividades",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/actividades/9999",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redirige si actividad no existe\", function () {\r",
+              "pm.response.to.have.status(302);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actividades/9999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actividades",
+            "9999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/actividades/nueva",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redirige al login si no hay sesión\", function () {\r",
+              "pm.response.to.have.status(302);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Redirección contiene login\", function () {\r",
+              "pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actividades/nueva",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actividades",
+            "nueva"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/mi-perfil",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redirige al login si no hay sesión\", function () {\r",
+              "pm.response.to.have.status(302);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Redirección contiene login\", function () {\r",
+              "pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/mi-perfil",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "mi-perfil"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/reservas",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redirige al login\", function () {\r",
+              "pm.response.to.have.status(302);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Location apunta a login\", function () {\r",
+              "pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/reservas",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "reservas"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8081/mis-seguidos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redirige al login\", function () {\r",
+              "    pm.response.to.have.status(302);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/mis-seguidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "mis-seguidos"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

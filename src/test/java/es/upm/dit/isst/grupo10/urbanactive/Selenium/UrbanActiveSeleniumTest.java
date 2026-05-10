@@ -16,6 +16,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ private final String BASE_URL = "http://localhost:8081";
 @BeforeEach
 
 // Configuración del WebDriver para Google Chrome
-void setUp() {
+/* void setUp() {
     WebDriverManager.chromedriver().setup();
 
     ChromeOptions options = new ChromeOptions();
@@ -49,10 +50,10 @@ void setUp() {
 
     driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
     driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
-}
+} */
 
 // Configuración del WebDriver para Microsoft Edgeç
-/* 
+
 void setUp() {
     System.setProperty("webdriver.edge.driver", "src/test/resources/edgedriver_win64/msedgedriver.exe");
     EdgeOptions options = new EdgeOptions();
@@ -69,7 +70,7 @@ void setUp() {
     driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
     driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
 }
-    */
+    
 
 @AfterEach
 void tearDown() {
@@ -124,63 +125,27 @@ void reservarActividadDesdeInterfazDebeMostrarExito() {
 
     driver.get(BASE_URL + "/actividades");
 
-    wait.until(ExpectedConditions.presenceOfElementLocated(
-            By.cssSelector(".activity-card")
-    ));
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".activity-card")));
 
-    WebElement primerDetalle = wait.until(
-            ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector(".activity-card a[href^='/actividades/']")
-            )
-    );
+    WebElement primerDetalle = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".activity-card a[href^='/actividades/']")));
 
-    ((JavascriptExecutor) driver).executeScript(
-            "arguments[0].scrollIntoView({block: 'center'});",
-            primerDetalle
-    );
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",primerDetalle);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();",primerDetalle);
 
-    ((JavascriptExecutor) driver).executeScript(
-            "arguments[0].click();",
-            primerDetalle
-    );
+    WebElement botonReservar = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("form.reserve-form button[type='submit']")));
 
-    WebElement botonReservar = wait.until(
-            ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("form.reserve-form button[type='submit']")
-            )
-    );
-
-    ((JavascriptExecutor) driver).executeScript(
-            "arguments[0].scrollIntoView({block: 'center'});",
-            botonReservar
-    );
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",botonReservar);
 
     if (!botonReservar.isEnabled()) {
-        assertTrue(
-                driver.getPageSource().contains("Ya reservada")
-                        || driver.getPageSource().contains("Sin plazas")
-        );
+        assertTrue(driver.getPageSource().contains("Ya reservada") || driver.getPageSource().contains("Sin plazas"));
         return;
     }
 
-    ((JavascriptExecutor) driver).executeScript(
-            "arguments[0].click();",
-            botonReservar
-    );
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botonReservar);
 
-    wait.until(ExpectedConditions.or(
-            ExpectedConditions.urlContains("/reservas/exito"),
-            ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//*[contains(text(),'Reserva') or contains(text(),'confirmada') or contains(text(),'plaza')]")
-            )
-    ));
+    wait.until(ExpectedConditions.or(ExpectedConditions.urlContains("/reservas/exito"),ExpectedConditions.presenceOfElementLocated(By.xpath("//*[contains(text(),'Reserva') or contains(text(),'confirmada') or contains(text(),'plaza')]"))));
 
-    assertTrue(
-            driver.getCurrentUrl().contains("/reservas/exito")
-                    || driver.getPageSource().contains("Reserva")
-                    || driver.getPageSource().contains("confirmada")
-                    || driver.getPageSource().contains("plaza")
-    );
+    assertTrue(driver.getCurrentUrl().contains("/reservas/exito") || driver.getPageSource().contains("Reserva") || driver.getPageSource().contains("confirmada") || driver.getPageSource().contains("plaza"));
 }
 
 @Test
@@ -199,5 +164,69 @@ driver.get(BASE_URL + "/login");
 driver.findElement(By.name("username")).sendKeys("usuario1@gmail.com");
 driver.findElement(By.name("password")).sendKeys("1234");
 driver.findElement(By.cssSelector("button[type='submit']")).click();
+}
+
+
+@Test
+void crearActividadDebeAparecerEnActividades() throws InterruptedException {
+    login();
+
+    driver.get(BASE_URL + "/actividades/nueva");
+
+    String titulo = "Actividad Test " + System.currentTimeMillis();
+
+    driver.findElement(By.name("titulo")).sendKeys(titulo);
+    driver.findElement(By.name("tipo")).sendKeys("Cardio");
+    driver.findElement(By.name("nivelDificultad")).sendKeys("Principiante");
+    driver.findElement(By.name("descripcion")).sendKeys("Actividad creada con Selenium");
+    driver.findElement(By.name("imagen")).sendKeys("https://via.placeholder.com/400x200");
+
+    // input type="date" necesita yyyy-MM-dd
+    ((JavascriptExecutor) driver).executeScript(
+        "document.querySelector('[name=\"fecha\"]').value='2026-12-20';"
+    );
+
+    driver.findElement(By.name("hora")).sendKeys("10:30");
+    driver.findElement(By.name("duracion")).sendKeys("60 min");
+
+    driver.findElement(By.name("plazasTotales")).clear();
+    driver.findElement(By.name("plazasTotales")).sendKeys("10");
+
+    // Por si el precio oculto queda vacío
+    ((JavascriptExecutor) driver).executeScript(
+        "var p = document.querySelector('[name=\"precio\"]'); if (p) p.value='0';"
+    );
+
+    Select espacio = new Select(driver.findElement(By.id("espacioSelect")));
+
+    boolean espacioEncontrado = false;
+
+    for (WebElement option : espacio.getOptions()) {
+        String texto = option.getText().toLowerCase();
+        System.out.println("ESPACIO: [" + option.getText() + "]");
+
+        if (texto.contains("madrid") && texto.contains("arganzuela")) {
+            option.click();
+            espacioEncontrado = true;
+            break;
+        }
+    }
+
+    assertTrue(espacioEncontrado);
+
+    WebElement boton = driver.findElement(By.cssSelector("button[type='submit']"));
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", boton);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", boton);
+
+    Thread.sleep(1500);
+
+    System.out.println("URL actual después de crear: " + driver.getCurrentUrl());
+
+    assertTrue(driver.getCurrentUrl().endsWith("/actividades"));
+
+    driver.get(BASE_URL + "/actividades");
+    Thread.sleep(1000);
+
+    assertTrue(driver.getPageSource().contains(titulo));
 }
 }

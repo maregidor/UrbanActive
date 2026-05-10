@@ -36,6 +36,11 @@ public class ReservaService {
 
             Actividad actividad = actividadOpt.get();
 
+            if (actividad.getUsuarioOrganizador() != null
+                && actividad.getUsuarioOrganizador().equals(usuario)) {
+            return false;
+            }
+
             if (actividad.getPlazasDisponibles() <= 0) {
                 return false;
             }

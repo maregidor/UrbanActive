@@ -103,20 +103,6 @@ assertTrue(driver.getCurrentUrl().contains("/login"));
 assertTrue(driver.getCurrentUrl().contains("error"));
 }
 
-/*@Test
-void reservarActividadDesdeInterfazDebeMostrarExito() {
-login();
-
-driver.get(BASE_URL + "/actividades/1");
-
-WebElement botonReservar = driver.findElement(By.cssSelector("button[type='submit']"));
-botonReservar.click();
-
-assertTrue(driver.getCurrentUrl().contains("/reservas/exito")
-|| driver.getPageSource().contains("Reserva")
-|| driver.getPageSource().contains("confirmada"));
-}*/
-
 @Test
 void reservarActividadDesdeInterfazDebeMostrarExito() {
     login();
@@ -229,4 +215,40 @@ void crearActividadDebeAparecerEnActividades() throws InterruptedException {
 
     assertTrue(driver.getPageSource().contains(titulo));
 }
+
+
+@Test
+void usuarioNoPuedeReservarActividadPropia() throws InterruptedException {
+    login();
+
+    driver.get(BASE_URL + "/actividades");
+
+    Thread.sleep(1000);
+
+    WebElement primerDetalle = driver.findElement(By.cssSelector(".activity-card a[href^='/actividades/']"));
+
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",primerDetalle);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();",primerDetalle);
+
+    Thread.sleep(1000);
+
+    WebElement botonReservar = driver.findElement(By.cssSelector("form.reserve-form button[type='submit']"));
+
+    if (!botonReservar.isEnabled()) {
+        assertTrue(
+            driver.getPageSource().contains("Ya reservada")
+            || driver.getPageSource().contains("Sin plazas")
+        );
+        return;
+    }
+
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});",botonReservar);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();",botonReservar);
+
+    Thread.sleep(1000);
+
+    assertFalse(driver.getCurrentUrl().contains("/reservas/exito"));
+    assertTrue(driver.getPageSource().contains("No se pudo realizar la reserva") || driver.getPageSource().contains("Ya tienes esta actividad reservada") || driver.getPageSource().contains("error") || driver.getPageSource().contains("Sin plazas"));
+}
+
 }

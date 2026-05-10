@@ -16,7 +16,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
             .requestMatchers("/", "/actividades", "/actividades/{id}", "/register/**").permitAll()
 
-            .requestMatchers("/actividades/nueva", "/actividades/guardar").authenticated()
+            .requestMatchers("/actividades/nueva", "/actividades/guardar").hasAnyRole("USER", "ORGA")
             .requestMatchers("/mis-actividades/**", "/mi-perfil-organizacion").hasRole("ORGA")
 
             .requestMatchers("/reservas/**", "/mis-seguidos", "/mi-perfil").hasRole("USER")

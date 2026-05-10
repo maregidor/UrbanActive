@@ -251,4 +251,45 @@ void usuarioNoPuedeReservarActividadPropia() throws InterruptedException {
     assertTrue(driver.getPageSource().contains("No se pudo realizar la reserva") || driver.getPageSource().contains("Ya tienes esta actividad reservada") || driver.getPageSource().contains("error") || driver.getPageSource().contains("Sin plazas"));
 }
 
+
+@Test
+void crearActividadConDatosErroneosDebeFallar() throws InterruptedException {
+    login();
+
+    driver.get(BASE_URL + "/actividades/nueva");
+
+    driver.findElement(By.name("tipo")).sendKeys("Cardio");
+    driver.findElement(By.name("nivelDificultad")).sendKeys("Principiante");
+    driver.findElement(By.name("descripcion")).sendKeys("Actividad con datos incorrectos");
+    driver.findElement(By.name("imagen")).sendKeys("https://via.placeholder.com/400x200");
+
+    ((JavascriptExecutor) driver).executeScript("document.querySelector('[name=\"fecha\"]').value='2026-12-20';");
+
+    driver.findElement(By.name("hora")).sendKeys("10:30");
+    driver.findElement(By.name("duracion")).sendKeys("60 min");
+    driver.findElement(By.name("plazasTotales")).clear();
+    driver.findElement(By.name("plazasTotales")).sendKeys("10");
+
+    Select espacio = new Select(driver.findElement(By.id("espacioSelect")));
+
+    for (WebElement option : espacio.getOptions()) {
+        String texto = option.getText().toLowerCase();
+
+        if (texto.contains("madrid") && texto.contains("arganzuela")) {
+            option.click();
+            break;
+        }
+    }
+
+    WebElement boton = driver.findElement(By.cssSelector("button[type='submit']"));
+
+    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", boton);
+    ((JavascriptExecutor) driver).executeScript("arguments[0].click();",boton);
+
+    Thread.sleep(1000);
+
+    assertTrue(driver.getCurrentUrl().contains("/actividades/nueva"));
+    assertFalse(driver.getPageSource().contains("Actividad con datos incorrectos"));
+}
+
 }

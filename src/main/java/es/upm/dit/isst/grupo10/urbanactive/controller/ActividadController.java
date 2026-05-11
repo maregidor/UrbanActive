@@ -135,7 +135,7 @@ public class ActividadController {
     @PostMapping("/actividades/guardar")
     public String guardarActividad(@ModelAttribute("actividad") Actividad actividad,
                                 @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
-                                @RequestParam Long espacioPublicoId) {
+                                @RequestParam(required = false) Long espacioPublicoId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String idPrincipal = auth.getName();
@@ -160,18 +160,26 @@ public class ActividadController {
             }
         }
 
-        EspacioPublico espacio = espacioPublicoRepository.findById(espacioPublicoId)
-                .orElseThrow(() -> new IllegalArgumentException("El espacio público seleccionado no existe"));
+        if (espacioPublicoId != null) {
+            EspacioPublico espacio = espacioPublicoRepository.findById(espacioPublicoId)
+                    .orElseThrow(() -> new IllegalArgumentException("El espacio público seleccionado no existe"));
 
-        actividad.setEspacioPublico(espacio);
-        actividad.setLatitud(espacio.getLatitud());
-        actividad.setLongitud(espacio.getLongitud());
+            actividad.setEspacioPublico(espacio);
+            actividad.setLatitud(espacio.getLatitud());
+            actividad.setLongitud(espacio.getLongitud());
+
+        } else {
+            if (actividad.getLatitud() == null || actividad.getLongitud() == null) {
+                throw new IllegalArgumentException("Debes seleccionar un espacio público o marcar un punto en el mapa");
+            }
+
+            actividad.setEspacioPublico(null);
+        }
 
         actividadService.crearNuevaActividad(actividad, idPrincipal);
 
         return "redirect:/actividades";
     }
-
     private Usuario getUsuarioAutenticado() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {

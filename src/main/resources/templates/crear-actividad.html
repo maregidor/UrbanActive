@@ -92,10 +92,10 @@
                                                 <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search"></i></span>
                                                 <input type="text" id="espacioSearch" class="form-control border-start-0" placeholder="Filtrar espacios...">
                                             </div>
-                                            <select name="espacioPublicoId" id="espacioSelect" class="form-select rounded-3" size="6" required>
-                                                <option value="" disabled selected>-- Selecciona un espacio público --</option>
-                                                <option th:each="espacio : ${espacios}" 
-                                                        th:value="${espacio.id}" 
+                                            <select name="espacioPublicoId" id="espacioSelect" class="form-select rounded-3" size="6">
+                                                <option value="" selected>-- No usar espacio verificado (usar mapa) --</option>
+                                                <option th:each="espacio : ${espacios}"
+                                                        th:value="${espacio.id}"
                                                         th:data-lat="${espacio.latitud}"
                                                         th:data-lon="${espacio.longitud}"
                                                         th:text="${espacio.nombre}">

@@ -1,5 +1,6 @@
 package es.upm.dit.isst.grupo10.urbanactive.controller;
 
+import es.upm.dit.isst.grupo10.urbanactive.model.Actividad;
 import es.upm.dit.isst.grupo10.urbanactive.model.Email;
 import es.upm.dit.isst.grupo10.urbanactive.model.Nivel;
 import es.upm.dit.isst.grupo10.urbanactive.model.Organizacion;
@@ -128,7 +129,8 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
 
         long numSeguidores = seguimientoUsuarioRepository.countBySeguido(perfil);
         long numSeguidos = seguimientoUsuarioRepository.countBySeguidor(perfil);
-        long numActividades = actividadRepository.countByUsuarioOrganizador(perfil);
+        List<Actividad> actividades = actividadRepository.findByUsuarioOrganizador(perfil);
+        long numActividades = actividades.size();
 
         model.addAttribute("perfil", perfil);
         model.addAttribute("esMiPerfil", esMiPerfil);
@@ -136,7 +138,7 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         model.addAttribute("numSeguidores", numSeguidores);
         model.addAttribute("numSeguidos", numSeguidos);
         model.addAttribute("numActividades", numActividades);
-
+        model.addAttribute("actividades", actividades);
         return "perfil-usuario";
     }
 
@@ -210,12 +212,14 @@ private final SeguimientoUsuarioRepository seguimientoUsuarioRepository;
         }
 
         long numSeguidores = seguimientoOrganizacionRepository.countByOrganizacion(perfil);
+        List<Actividad> actividades = actividadRepository.findByOrganizacion(perfil);
 
         // Mantiene compatibilidad con la plantilla actual y con futuros usos del nombre "perfil".
         model.addAttribute("perfil", perfil);
         model.addAttribute("organizacion", perfil);
         model.addAttribute("yaLaSigue", yaLaSigue);
         model.addAttribute("numSeguidores", numSeguidores);
+        model.addAttribute("actividades", actividades);
 
         return "perfil-organizacion";
     }
